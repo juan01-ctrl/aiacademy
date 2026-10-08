@@ -1,0 +1,27 @@
+id: pipeline
+title: A fixed order
+summary: SequentialAgent runs sub-agents in list order. The writer comes after the researcher.
+durationMinutes: 14
+steps:
+  - id: adk-sequence-idea
+    type: explanation
+    title: SequentialAgent
+    body:
+      - "A SequentialAgent runs other agents in list order. It is a workflow, not an open loop. You already know the next step."
+      - "The researcher runs first. The writer runs second. The order is the list you pass as sub_agents."
+    takeaway: Name the pipeline and pass both agents.
+    example: |
+      SequentialAgent(name="pipeline", sub_agents=[researcher, writer])
+  - id: adk-order
+    type: explanation
+    title: Order is the list
+    body:
+      - "If the writer is first, the report is written before the research exists. Put the researcher first."
+      - "Each sub-agent is still an Agent with a name and an instruction. The pipeline does not replace those."
+    takeaway: sub_agents=[researcher, writer].
+    example: |
+      researcher = Agent(name="researcher", model="gemini-flash-latest", instruction="Research.", tools=[])
+      writer = Agent(name="writer", model="gemini-flash-latest", instruction="Write.", tools=[])
+  - id: adk-practice-sequence
+    type: exercise
+    exerciseId: adk-sequence

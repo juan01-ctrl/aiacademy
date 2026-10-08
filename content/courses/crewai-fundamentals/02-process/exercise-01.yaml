@@ -1,0 +1,17 @@
+id: crew-sequential
+title: Run a sequential crew
+order: 1
+instructions:
+  - Build a researcher and a task assigned to that researcher.
+  - Construct the crew with process set to sequential.
+  - Return kickoff().
+starterCode: |
+  from crewai import Agent, Crew, Task
+
+  def run_sequential():
+      researcher = Agent(role="researcher", goal="Find the source")
+      task = Task(description="Collect notes", agent=researcher)
+      return ""
+hints:
+  - process is a keyword on Crew, not a field you hope the agent infers.
+runtime: python

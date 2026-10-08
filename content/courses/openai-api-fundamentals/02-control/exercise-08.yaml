@@ -1,0 +1,20 @@
+id: pass-temperature
+title: Pass temperature through
+order: 8
+instructions:
+  - Send the temperature argument into responses.create.
+  - Do not hard-code a different number.
+  - Return response.output_text.
+starterCode: |
+  from openai import OpenAI
+
+  def ask_with_temperature(prompt: str, temperature: float) -> str:
+      client = OpenAI()
+      response = client.responses.create(
+          model="gpt-4.1-mini",
+          input=prompt,
+      )
+      return response.output_text
+hints:
+  - temperature is a keyword on responses.create, next to model and input.
+runtime: python

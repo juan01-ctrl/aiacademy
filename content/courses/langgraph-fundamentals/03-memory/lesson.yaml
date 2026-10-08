@@ -1,0 +1,28 @@
+id: checkpointer
+title: A pause needs a checkpointer
+summary: A checkpointer saves the run so a later invoke can resume it. You attach it in compile.
+durationMinutes: 14
+steps:
+  - id: lg-no-thread-without-a-saver
+    type: explanation
+    title: No thread without a saver
+    body:
+      - "Without a checkpointer, each invoke starts from the input you just passed. There is no saved run to continue."
+      - "A checkpointer is the saver. InMemorySaver is enough to learn it. A database saver is the same idea with a different store."
+      - "You pass the saver to compile, not into the node. thread_id selects which saved run you are continuing. A new id is a new run, not a resume."
+    takeaway: Durability is a compile argument, not a line inside the node.
+    example: |
+      graph.compile(checkpointer=saver)
+  - id: lg-interrupt-needs-that-saver
+    type: explanation
+    title: Interrupt needs that saver
+    body:
+      - "Human-in-the-loop means a person can inspect or change state in the middle of a run. interrupt pauses the node and returns a value to the caller. Resume sends that value back into the same node."
+      - "That pause has to be stored. Without a checkpointer there is nowhere to put it, so the run cannot resume."
+      - "A prompt that says wait for a person does not pause the graph. The pause is interrupt, and the save is the checkpointer."
+    takeaway: Compile with a checkpointer before you design a pause.
+    example: |
+      approved = interrupt("Do you approve this action?")
+  - id: lg-practice-checkpointer
+    type: exercise
+    exerciseId: lg-checkpointer

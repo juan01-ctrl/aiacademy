@@ -1,0 +1,17 @@
+id: agent-loop
+title: Run the loop
+order: 1
+instructions:
+  - Call llm until the returned tool is done.
+  - When the tool is not done, call run_tool with that name, then call llm again.
+  - Return the text from the done turn.
+starterCode: |
+  from academy_loop import llm, run_tool
+
+  def run_until_done() -> str:
+      messages = ["start"]
+      step = llm(messages)
+      return step["text"]
+hints:
+  - Keep a while loop. Stop only when tool is done.
+runtime: python

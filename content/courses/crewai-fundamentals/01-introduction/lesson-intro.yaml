@@ -1,0 +1,44 @@
+id: what-is-crewai
+title: What is CrewAI
+summary: CrewAI runs a team of agents. Each agent has a role. Each task has an owner.
+durationMinutes: 16
+steps:
+  - id: crew-what-is-it
+    type: explanation
+    title: What is CrewAI
+    body:
+      - "CrewAI is a framework for orchestrating autonomous agents. A crew is the team. An agent has a role, a goal, and a backstory. A task has a description, an expected output, and an owner."
+      - "Constructing the agent does not run it. kickoff is the call that starts the crew and returns the result."
+      - "A Flow is the process around that team. It owns state and the order of steps, and it can call a crew to do one of those steps. This course builds the crew. The Flow comes after the team exists."
+    takeaway: A crew is a team of roles. kickoff starts the work.
+    example: |
+      from crewai import Agent, Task, Crew
+  - id: crew-what-for
+    type: explanation
+    title: What is it used for
+    body:
+      - "Use a crew when the work splits into roles you can name. The quickstart uses one researcher to search a topic and write a markdown report."
+      - "Use sequential process when you already know the order. The researcher finishes, then the next task can use that output. Hierarchical process is for when a manager must assign the work."
+      - "Do not use a crew for one function call with no role and no task. That is responses.create."
+    takeaway: Use a crew when more than one role must do ordered work.
+    example: |
+      Crew(agents=[researcher], tasks=[task], process="sequential")
+  - id: crew-what-you-will-learn
+    type: explanation
+    title: What you will practice here
+    body:
+      - "You will create a researcher with a role and a goal, assign a task with an expected output, choose sequential process, and return kickoff."
+      - "The quickstart order is agent, task, crew with a process, then kickoff. That is the order here."
+      - "Custom tools and Flows sit on a crew that already has an owner."
+    takeaway: Role, task, process, kickoff.
+    example: |
+      return crew.kickoff()
+  - id: crew-before-the-editor
+    type: explanation
+    title: Before the editor
+    body:
+      - "role is the name other tasks use. goal is the outcome. The task description is the work. expected_output is the shape of the result, such as a markdown report."
+      - "The next lesson creates the researcher and assigns Collect notes."
+    takeaway: Next you will create an Agent and a Task.
+    example: |
+      researcher = Agent(role="researcher", goal="Find the source")

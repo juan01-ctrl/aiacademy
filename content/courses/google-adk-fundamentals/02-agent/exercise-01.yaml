@@ -1,0 +1,18 @@
+id: adk-build
+title: Create the researcher
+order: 1
+instructions:
+  - Create an Agent named researcher.
+  - Use model gemini-flash-latest.
+  - Set instruction to You help users research topics thoroughly.
+  - Pass google_search in tools.
+  - Return the agent.
+starterCode: |
+  from google.adk import Agent
+  from google.adk.tools import google_search
+
+  def build_agent():
+      return None
+hints:
+  - tools is a list with one item, google_search.
+runtime: python

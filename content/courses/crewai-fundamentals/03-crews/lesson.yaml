@@ -1,0 +1,26 @@
+id: kickoff
+title: Kick off the crew
+summary: A crew is the agent list plus the task list. kickoff is what runs them.
+durationMinutes: 14
+steps:
+  - id: crew-is-a-list
+    type: explanation
+    title: A crew is two lists
+    body:
+      - "A crew is the team plus the work. You pass agents and tasks. Construction does not run anything."
+      - "With sequential process, task order is run order. An empty task list has nothing to run."
+    takeaway: Pass both lists. Do not kick off an empty crew.
+    example: |
+      crew = Crew(agents=[researcher], tasks=[task])
+  - id: crew-kickoff-returns
+    type: explanation
+    title: kickoff runs the work
+    body:
+      - "kickoff starts the crew and returns the result. Forgetting it is the usual bug. The objects exist, and nothing happened."
+      - "Return that result. Building the crew and not returning kickoff leaves the caller with no report."
+    takeaway: Return the value of crew.kickoff().
+    example: |
+      return crew.kickoff()
+  - id: crew-practice-kickoff
+    type: exercise
+    exerciseId: crew-kickoff

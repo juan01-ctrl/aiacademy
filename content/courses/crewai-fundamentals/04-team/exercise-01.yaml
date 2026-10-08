@@ -1,0 +1,19 @@
+id: crew-context
+title: Writer with context
+order: 4
+instructions:
+  - Create a researcher and a task described as Collect notes.
+  - Create a writer and a task described as Write the report.
+  - Set expected_output to A markdown report.
+  - Pass the research task in context.
+  - Return the writer task.
+starterCode: |
+  from crewai import Agent, Task
+
+  def build_writer():
+      researcher = Agent(role="researcher", goal="Find the source")
+      research_task = Task(description="Collect notes", agent=researcher)
+      return research_task
+hints:
+  - context is a list with the research task in it.
+runtime: python

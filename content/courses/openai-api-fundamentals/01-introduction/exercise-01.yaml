@@ -1,0 +1,20 @@
+id: return-output-text
+title: Return the generated text
+order: 1
+instructions:
+  - Complete ask_llm so it sends prompt to responses.create.
+  - Return only response.output_text.
+  - Run code to experiment. Submit answer to be graded.
+starterCode: |
+  from openai import OpenAI
+
+  def ask_llm(prompt: str) -> str:
+      client = OpenAI()
+      response = client.responses.create(
+          model="gpt-4.1-mini",
+          input=prompt,
+      )
+      return ""
+hints:
+  - The convenience string lives on output_text, not on output[0].
+runtime: python

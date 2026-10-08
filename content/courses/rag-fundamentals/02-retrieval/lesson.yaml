@@ -1,0 +1,26 @@
+id: cite-the-source
+title: Cite the source
+summary: Retrieval finds a passage. Generation uses that passage. The source is the citation.
+durationMinutes: 14
+steps:
+  - id: rag-search-first
+    type: explanation
+    title: Search first
+    body:
+      - "After the index exists, a question has two steps. Retrieve the relevant chunks. Then generate an answer from a prompt that includes the question and the retrieved text."
+      - "You cannot cite a passage you did not fetch. search returns hits. Each hit has text, the evidence, and source, the citation."
+    takeaway: Call index.search before you build the answer.
+    example: |
+      hits = index.search(query, k=2)
+  - id: rag-return-the-source
+    type: explanation
+    title: Return the source
+    body:
+      - "The answer prompt should include hits[0][\"text\"]. The citation is hits[0][\"source\"]."
+      - "This exercise returns the source of the first hit, not the whole list. Returning the list dumps the index into the caller."
+    takeaway: Return hits[0]["source"].
+    example: |
+      return hits[0]["source"]
+  - id: rag-practice-cite
+    type: exercise
+    exerciseId: rag-cite

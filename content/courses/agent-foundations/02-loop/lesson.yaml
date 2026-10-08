@@ -1,0 +1,29 @@
+id: run-the-loop
+title: Run until done
+summary: Call the model, run the tool it asks for, and stop only when it is done.
+durationMinutes: 20
+steps:
+  - id: agent-one-call
+    type: explanation
+    title: One call is not a loop
+    body:
+      - "The first llm call may return tool search. If you return that text, the goal is not done. You only asked once."
+      - "Append the tool result and call llm again. The second call in this exercise returns tool done and the text booked."
+    takeaway: A loop keeps going until the model stops asking for tools.
+    example: |
+      step = llm(messages)
+      if step["tool"] != "done":
+          run_tool(step["tool"])
+  - id: agent-stop
+    type: explanation
+    title: Stop on done
+    body:
+      - "When tool is done, return text. Do not call run_tool for done. done means the model finished."
+      - "The project uses the same loop for a goal string. Put the goal in the first message list."
+    takeaway: Return the text from the done turn.
+    example: |
+      if step["tool"] == "done":
+          return step["text"]
+  - id: agent-practice
+    type: exercise
+    exerciseId: agent-loop

@@ -1,0 +1,15 @@
+id: adk-project
+title: Researcher agent
+order: 1
+instructions:
+  - Create the researcher agent with gemini-flash-latest, a research instruction, and google_search.
+  - Return the agent.
+starterCode: |
+  from google.adk import Agent
+  from google.adk.tools import google_search
+
+  def build_researcher():
+      return None
+hints:
+  - Same four arguments as the lesson.
+runtime: python

@@ -1,0 +1,30 @@
+id: build-and-run
+title: Build and run
+summary: Name and instructions define the agent. run_sync starts it. final_output is the text.
+durationMinutes: 20
+steps:
+  - id: sdk-name
+    type: explanation
+    title: Name and instructions
+    body:
+      - "name is the label other agents use. instructions is how this agent should behave, the same job as instructions on a Responses request."
+      - "The hello world uses name Assistant and instructions You are a helpful assistant."
+    takeaway: Pass both. A name without instructions is an empty worker.
+    example: |
+      Agent(name="Assistant", instructions="You are a helpful assistant")
+  - id: sdk-practice-build
+    type: exercise
+    exerciseId: agents-build
+  - id: sdk-run
+    type: explanation
+    title: Runner.run_sync
+    body:
+      - "Runner.run_sync(agent, prompt) runs the loop and returns a result. The finished text is result.final_output."
+      - "The prompt in the hello world is Write a haiku about recursion in programming. Return final_output, not the result object."
+    takeaway: Run the agent, then return final_output.
+    example: |
+      result = Runner.run_sync(agent, prompt)
+      return result.final_output
+  - id: sdk-practice-run
+    type: exercise
+    exerciseId: agents-run

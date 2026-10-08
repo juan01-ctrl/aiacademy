@@ -1,0 +1,35 @@
+id: instructions-vs-input
+title: Instructions and input
+summary: instructions is the standing rule. input is the user message. The rule wins if they disagree.
+durationMinutes: 14
+steps:
+  - id: two-different-jobs
+    type: explanation
+    title: Two different jobs
+    body:
+      - "instructions is how the model should behave for this request: tone, goal, and examples of a correct reply. It takes priority over a prompt in input."
+      - "input is the message for this turn. It is the question or the text to transform. It is not a second copy of the rule."
+      - "A pirate tutor puts Talk like a pirate in instructions and Are semicolons optional in JavaScript? in input. The joke is the rule. The question is the message."
+    takeaway: The rule and the message are different arguments.
+    example: |
+      client.responses.create(
+          model="gpt-4.1-mini",
+          instructions="Talk like a pirate.",
+          input="Are semicolons optional in JavaScript?",
+      )
+  - id: do-not-swap-them
+    type: explanation
+    title: Do not swap them
+    body:
+      - "Think of instructions as the function definition and input as the argument. The rule stays fixed. The message changes every call."
+      - "Putting the rule only in input, and leaving instructions empty, is a different request. The priority no longer applies."
+    takeaway: Pass instructions=instructions and input=prompt.
+    example: |
+      client.responses.create(
+          model="gpt-4.1-mini",
+          instructions=instructions,
+          input=prompt,
+      )
+  - id: practice-instructions
+    type: exercise
+    exerciseId: pass-instructions

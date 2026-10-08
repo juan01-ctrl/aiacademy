@@ -1,0 +1,29 @@
+id: draft-then-review
+title: Draft, then review
+summary: A second node can read the state the first node wrote. The edge is what makes that order real.
+durationMinutes: 14
+steps:
+  - id: lg-two-nodes
+    type: explanation
+    title: Two nodes share state
+    body:
+      - "One node cannot show shared state. draft writes notes. review reads those notes. Both are functions on the same graph."
+      - "add_edge(\"draft\", \"review\") is the fixed hop. Review always comes after draft."
+    takeaway: Register both nodes, then connect them.
+    example: |
+      graph.add_node("draft", draft)
+      graph.add_node("review", review)
+      graph.add_edge("draft", "review")
+  - id: lg-compile-the-chain
+    type: explanation
+    title: Compile the chain
+    body:
+      - "set_entry_point(\"draft\") starts the run at the writer, not at review."
+      - "compile checks that the nodes and the edge exist. Without it, invoke has nothing to run."
+    takeaway: Entry point, edge, then compile.
+    example: |
+      graph.set_entry_point("draft")
+      graph.compile()
+  - id: lg-practice-chain
+    type: exercise
+    exerciseId: lg-chain

@@ -1,0 +1,16 @@
+id: rag-empty
+title: Refuse a missing source
+order: 1
+instructions:
+  - Search the index with the query.
+  - If there are no hits, return an empty string.
+  - If there is a hit, return its source.
+starterCode: |
+  from retrieval import Index
+
+  def cite(query: str) -> str:
+      index = Index()
+      return "notes.md"
+hints:
+  - Do not hard-code the source. Read it from the hit, and handle an empty list.
+runtime: python

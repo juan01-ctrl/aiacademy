@@ -1,0 +1,16 @@
+id: crew-kickoff
+title: Run the crew
+order: 1
+instructions:
+  - Build a Crew with the researcher and the task.
+  - Return the result of kickoff.
+starterCode: |
+  from crewai import Agent, Crew, Task
+
+  def run_crew():
+      researcher = Agent(role="researcher", goal="Find the source")
+      task = Task(description="Collect notes", agent=researcher)
+      return ""
+hints:
+  - Crew needs both lists. kickoff is a method, not a constructor argument.
+runtime: python

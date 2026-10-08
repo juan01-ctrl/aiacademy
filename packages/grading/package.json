@@ -1,0 +1,12 @@
+{
+  "name": "@academy/grading",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./assessment": "./src/assessment.ts"
+  },
+  "scripts": { "test": "vitest run", "typecheck": "tsc --noEmit" },
+  "devDependencies": { "typescript": "^5.9.2", "vitest": "^3.2.4" }
+}

@@ -1,0 +1,20 @@
+id: pass-json-schema
+title: Pass a JSON schema
+order: 7
+instructions:
+  - Send text_format as the text argument.
+  - The schema name must stay answer.
+  - Return response.output_text.
+starterCode: |
+  from openai import OpenAI
+
+  def ask_for_json(prompt: str, text_format: dict) -> str:
+      client = OpenAI()
+      response = client.responses.create(
+          model="gpt-4.1-mini",
+          input=prompt,
+      )
+      return response.output_text
+hints:
+  - The keyword is text, and its value is the format dict you received.
+runtime: python

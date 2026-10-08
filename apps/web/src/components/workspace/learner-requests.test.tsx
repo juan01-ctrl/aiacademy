@@ -1,0 +1,133 @@
+import React, { type ReactElement, type ReactNode } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { Workspace } from "./Workspace";
+import { ExplanationStep } from "../lesson/ExplanationStep";
+import { EnrollButton } from "../course/EnrollButton";
+
+// No DOM dependency is installed. Keep real component handlers and markup;
+// replace only hook scheduling, external editor loading and transport/location.
+const hooks = vi.hoisted(() => ({ values: [] as unknown[], cursor: 0 }));
+vi.mock("react", async (original) => ({
+  ...await original<typeof import("react")>(),
+  useState: (initial: unknown) => {
+    const index = hooks.cursor++;
+    if (!(index in hooks.values)) hooks.values[index] = initial;
+    return [hooks.values[index], (value: unknown) => { hooks.values[index] = typeof value === "function" ? value(hooks.values[index]) : value; }];
+  },
+  useRef: (initial: unknown) => {
+    const index = hooks.cursor++;
+    if (!(index in hooks.values)) hooks.values[index] = { current: initial };
+    return hooks.values[index];
+  },
+}));
+vi.mock("next/dynamic", () => ({ default: () => () => null }));
+function nodes(node: ReactNode): ReactElement<Record<string, unknown>>[] {
+  if (Array.isArray(node)) return node.flatMap(nodes);
+  if (!React.isValidElement<Record<string, unknown>>(node)) return [];
+  return [node, ...nodes(node.props.children as ReactNode)];
+}
+function render(component: () => ReactElement) { hooks.cursor = 0; return component(); }
+function button(tree: ReactElement, label: string) {
+  const found = nodes(tree).find((node) => node.type === "button" && node.props.children === label);
+  if (!found) throw new Error(`Missing button: ${label}`);
+  return found;
+}
+function click(node: ReactElement<Record<string, unknown>>) { return (node.props.onClick as () => Promise<void>)(); }
+function deferred() { let resolve!: (response: Response) => void; const promise = new Promise<Response>((r) => { resolve = r; }); return { promise, resolve }; }
+function response(body: unknown, status = 200) { return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } }); }
+const valid = { status: "passed", stdout: "executed-output", stderr: "", truncated: false, feedback: [] };
+const exercise = { id: "practice", title: "Practice", order: 1, instructions: [], starterCode: "starter", hints: [], runtime: "python" as const };
+const workspace = (passed = false, nextHref: string | null = "/next") => () => Workspace({ exercise, initialCode: "my code", passed, previousHref: null, nextHref });
+const explanation = () => ExplanationStep({ stepId: "intro", title: "Intro", body: [], takeaway: "idea", example: "code", previousHref: null, nextHref: "/next" });
+const enroll = () => EnrollButton({ courseId: "sample" });
+beforeEach(() => { hooks.values = []; hooks.cursor = 0; vi.stubGlobal("React", React); vi.stubGlobal("window", { location: { href: "/current", reload: vi.fn() } }); });
+
+for (const [name, component, label, pendingLabel, ack] of [
+  ["Workspace", workspace(), "Submit answer", "Submitting", { result: valid, passedExerciseIds: ["practice"], certificateHref: null }],
+  ["Explanation", explanation, "Continue", "Saving", { completed: true }],
+  ["Enrollment", enroll, "Enroll and start", "Enrolling…", { enrolled: true }],
+] as const) {
+  describe(name, () => {
+    it("blocks same-tick duplicate calls and exposes disabled pending control", async () => {
+      const request = deferred(); const fetch = vi.fn(() => request.promise); vi.stubGlobal("fetch", fetch);
+      const control = button(render(component), label); const first = click(control); const duplicate = click(control);
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(button(render(component), pendingLabel).props.disabled).toBe(true);
+      expect(renderToStaticMarkup(render(component))).toContain('disabled=""');
+      request.resolve(response(ack)); await Promise.all([first, duplicate]);
+    });
+    for (const [failure, transport] of [
+      ["network", () => Promise.reject(new Error("offline"))],
+      ["non-JSON", () => Promise.resolve(new Response("<html>oops</html>"))],
+      ["malformed", () => Promise.resolve(response({}))],
+      ["null", () => Promise.resolve(response(null))],
+      ["HTTP authentication", () => Promise.resolve(response({ error: "Sign in required." }, 401))],
+      ["HTTP order", () => Promise.resolve(response({ error: "This step is locked." }, 403))],
+      ["HTTP not found", () => Promise.resolve(response({ error: "Unknown explanation." }, 404))],
+    ] as const) {
+      it(`recovers from ${failure} without success effects and clears error on retry`, async () => {
+        const fetch = vi.fn(transport); vi.stubGlobal("fetch", fetch);
+        await expect(click(button(render(component), label))).resolves.toBeUndefined();
+        let tree = render(component); const html = renderToStaticMarkup(tree);
+        expect(html).toContain('role="alert"');
+        if (failure === "HTTP authentication") expect(html).toContain("Sign in required.");
+        if (failure === "HTTP order") expect(html).toContain("This step is locked.");
+        if (failure === "HTTP not found") expect(html).toContain("Unknown explanation.");
+        expect(button(tree, label).props.disabled).toBeFalsy();
+        expect(window.location.href).toBe("/current"); expect(window.location.reload).not.toHaveBeenCalled();
+        if (name === "Workspace") { expect(nodes(tree).find((node) => node.props.value === "my code")).toBeDefined(); expect(html).not.toContain('>Continue</a>'); }
+        const request = deferred(); fetch.mockImplementation(() => request.promise);
+        const retry = click(button(tree, label)); tree = render(component);
+        expect(renderToStaticMarkup(tree)).not.toContain('role="alert"');
+        request.resolve(response(ack)); await retry;
+        expect(fetch).toHaveBeenCalledTimes(2);
+        if (name === "Explanation") expect(window.location.href).toBe("/next");
+        if (name === "Enrollment") expect(window.location.reload).toHaveBeenCalledTimes(1);
+      });
+    }
+    it("rejects unsuccessful HTTP even with a successful-looking acknowledgment", async () => {
+      vi.stubGlobal("fetch", vi.fn(async () => response(ack, 500)));
+      await click(button(render(component), label));
+      expect(renderToStaticMarkup(render(component))).toContain('role="alert"');
+      expect(window.location.href).toBe("/current"); expect(window.location.reload).not.toHaveBeenCalled();
+    });
+  });
+}
+describe("Workspace result and navigation protocol", () => {
+  for (const result of [{ ...valid, status: "unknown" }, { ...valid, stdout: 4 }, { ...valid, feedback: [{ message: "missing concept" }] }, { ...valid, hiddenTests: [] }]) {
+    it(`rejects invalid result ${JSON.stringify(result)} without changing navigation`, async () => {
+      vi.stubGlobal("fetch", vi.fn(async () => response({ result, certificateHref: "/certificate/OWN" })));
+      const component = workspace(); await click(button(render(component), "Submit answer"));
+      const html = renderToStaticMarkup(render(component)); expect(html).toContain('role="alert"'); expect(html).not.toContain('/certificate/OWN'); expect(button(render(component), "Submit answer").props.disabled).toBe(false);
+    });
+  }
+  it("rejects malformed certificate navigation before committing result", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => response({ result: valid, certificateHref: { id: "OWN" } })));
+    const component = workspace(); await click(button(render(component), "Submit answer"));
+    expect(renderToStaticMarkup(render(component))).toContain('role="alert"');
+    expect(renderToStaticMarkup(render(component))).not.toContain("executed-output");
+  });
+  it("shows request errors on historically passed exercises without losing Continue", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => response({ error: "Sign in required." }, 401)));
+    const component = workspace(true); await click(button(render(component), "Run code"));
+    const html = renderToStaticMarkup(render(component)); expect(html).toContain('role="alert"'); expect(html).toContain('href="/next"'); expect(html).toContain('>Continue</a>');
+  });
+  it("Run never completes or changes destination but passed Submit uses returned credential", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => response({ result: valid, certificateHref: "/certificate/OWN" })));
+    const component = workspace(); await click(button(render(component), "Run code"));
+    expect(renderToStaticMarkup(render(component))).not.toContain('>Continue</a>');
+    await click(button(render(component), "Submit answer"));
+    expect(renderToStaticMarkup(render(component))).toContain('href="/certificate/OWN"');
+  });
+  it("passed-but-uncertified projects can submit again and recover a credential", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => response({ result: valid, certificateHref: "/certificate/OWN" })));
+    const component = workspace(false, "/courses/sample"); await click(button(render(component), "Submit answer"));
+    expect(renderToStaticMarkup(render(component))).toContain('href="/certificate/OWN"');
+  });
+  it("keeps grading failures distinct from request alerts", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => response({ result: { ...valid, status: "failed", feedback: [{ concept: "loops", message: "Try again" }] } })));
+    const component = workspace(); await click(button(render(component), "Submit answer"));
+    const html = renderToStaticMarkup(render(component)); expect(html).toContain("Not quite right"); expect(html).toContain("Try again"); expect(html).not.toContain('role="alert"');
+  });
+});

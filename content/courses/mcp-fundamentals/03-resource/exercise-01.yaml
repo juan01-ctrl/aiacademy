@@ -1,0 +1,16 @@
+id: mcp-resource
+title: Publish the handbook
+order: 2
+instructions:
+  - Create a FastMCP server named weather.
+  - Register read_notes with mcp.resource at notes://handbook.
+  - Return the server.
+starterCode: |
+  from mcp.server.fastmcp import FastMCP
+
+  def add_notes():
+      mcp = FastMCP("weather")
+      return mcp
+hints:
+  - The decorator is mcp.resource("notes://handbook").
+runtime: python

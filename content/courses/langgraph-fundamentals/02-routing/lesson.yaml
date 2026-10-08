@@ -1,0 +1,31 @@
+id: conditional-edge
+title: Route from state
+summary: A fixed edge always goes to the same node. A conditional edge chooses from state.
+durationMinutes: 14
+steps:
+  - id: lg-edges-are-fixed
+    type: explanation
+    title: An edge is a fixed hop
+    body:
+      - "add_edge(source, target) is a fixed hop. add_edge(\"draft\", \"review\") always continues to review."
+      - "Use it when the next step never changes. A draft that must always be reviewed does not need a choice."
+    takeaway: Use a plain edge when the path is certain.
+    example: |
+      graph.add_edge("draft", "review")
+  - id: lg-route-on-a-flag
+    type: explanation
+    title: Route on a flag
+    body:
+      - "add_conditional_edges takes a source node, a router function, and a map of route names."
+      - "The router reads state and returns a key. That key must exist in the map. approve can go to done. revise can go back to draft."
+      - "A router that returns a key missing from the map is a broken graph. The path is not a sentence in a prompt."
+    takeaway: The route names in this exercise are approve and revise.
+    example: |
+      graph.add_conditional_edges(
+          "review",
+          router,
+          {"approve": "done", "revise": "draft"},
+      )
+  - id: lg-practice-route
+    type: exercise
+    exerciseId: lg-route

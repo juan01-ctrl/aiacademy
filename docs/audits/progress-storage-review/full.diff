@@ -1,0 +1,407 @@
+--- before/apps/web/src/lib/progress-store.ts
++++ after/apps/web/src/lib/progress-store.ts
+@@ -1,8 +1,8 @@
+ import { randomUUID } from "node:crypto";
+-import { mkdir, readFile, writeFile } from "node:fs/promises";
++import { mkdir, open, readFile, rename, rmdir, unlink } from "node:fs/promises";
+ import path from "node:path";
+ import { applySubmission, completeExplanation, type ProgressState } from "@academy/course-engine";
+-import type { OperationalStatus } from "@academy/contracts";
++import { operationalStatusSchema, type OperationalStatus } from "@academy/contracts";
+ 
+ type Attempt = {
+   id: string;
+@@ -34,13 +34,49 @@
+ };
+ 
+ const filePath = path.resolve(process.cwd(), "data/progress.json");
+-let queue: Promise<unknown> = Promise.resolve();
++const lockPath = `${filePath}.lock`;
+ 
++function hasCode(error: unknown, code: string): boolean {
++  return typeof error === "object" && error !== null && "code" in error && error.code === code;
++}
++
++function isObject(value: unknown): value is Record<string, unknown> {
++  return typeof value === "object" && value !== null && !Array.isArray(value);
++}
++
++function isStrings(value: unknown): value is string[] {
++  return Array.isArray(value) && value.every((item) => typeof item === "string");
++}
++
++function isCertificate(value: unknown): boolean {
++  return isObject(value) && ["id", "courseId", "holderName", "title", "issuedAt"].every((key) => typeof value[key] === "string") && isStrings(value.skills);
++}
++
++// Validate known fields without stripping historical or future extension fields.
++function assertStore(value: unknown): asserts value is FileShape {
++  const invalid = () => { throw new Error("Invalid progress storage schema; refusing to overwrite learner data"); };
++  if (!isObject(value) || !isObject(value.learners)) return invalid();
++  for (const record of Object.values(value.learners)) {
++    if (!isObject(record)) return invalid();
++    for (const key of ["enrolledCourseIds", "passedExerciseIds", "completedStepIds", "assessmentCourseIds"]) {
++      if (record[key] !== undefined && !isStrings(record[key])) return invalid();
++    }
++    if (record.drafts !== undefined && (!isObject(record.drafts) || !Object.values(record.drafts).every((draft) => typeof draft === "string"))) return invalid();
++    if (record.assessmentPassed !== undefined && typeof record.assessmentPassed !== "boolean") return invalid();
++    if (record.certificate !== undefined && record.certificate !== null && !isCertificate(record.certificate)) return invalid();
++    if (record.certificatesByCourseId !== undefined && (!isObject(record.certificatesByCourseId) || !Object.values(record.certificatesByCourseId).every(isCertificate))) return invalid();
++    if (record.attempts !== undefined && (!Array.isArray(record.attempts) || !record.attempts.every((attempt) =>
++      isObject(attempt) && ["id", "exerciseId", "at"].every((key) => typeof attempt[key] === "string") && operationalStatusSchema.safeParse(attempt.status).success,
++    ))) return invalid();
++  }
++}
++
+ function normalize(record: Partial<LearnerRecord> | undefined): LearnerRecord {
+   const certificatesByCourseId = { ...record?.certificatesByCourseId };
+   const legacy = record?.certificate;
+   if (legacy && !certificatesByCourseId[legacy.courseId]) certificatesByCourseId[legacy.courseId] = legacy;
+   return {
++    ...record,
+     enrolledCourseIds: record?.enrolledCourseIds ?? [],
+     passedExerciseIds: record?.passedExerciseIds ?? [],
+     completedStepIds: record?.completedStepIds ?? [],
+@@ -54,22 +90,66 @@
+ }
+ 
+ async function readStore(): Promise<FileShape> {
++  let text: string;
+   try {
+-    return JSON.parse(await readFile(filePath, "utf8")) as FileShape;
+-  } catch {
+-    return { learners: {} };
++    text = await readFile(filePath, "utf8");
++  } catch (error) {
++    if (hasCode(error, "ENOENT")) return { learners: {} };
++    throw error;
+   }
++  const store: unknown = JSON.parse(text);
++  assertStore(store);
++  return store;
+ }
+ 
+ async function writeStore(store: FileShape): Promise<void> {
+-  await mkdir(path.dirname(filePath), { recursive: true });
+-  await writeFile(filePath, `${JSON.stringify(store, null, 2)}\n`);
++  const temporaryPath = `${filePath}.${randomUUID()}.tmp`;
++  // A failed exclusive open never grants ownership of an existing path.
++  const handle = await open(temporaryPath, "wx", 0o600);
++  try {
++    try {
++      await handle.writeFile(`${JSON.stringify(store, null, 2)}\n`, "utf8");
++    } finally {
++      await handle.close();
++    }
++    await rename(temporaryPath, filePath);
++  } catch (error) {
++    try {
++      await unlink(temporaryPath);
++    } catch (cleanupError) {
++      throw new AggregateError([error, cleanupError], "Progress write failed; own temporary-file cleanup also failed");
++    }
++    throw error;
++  }
+ }
+ 
+-function withLock<T>(work: () => Promise<T>): Promise<T> {
+-  const run = queue.then(work, work);
+-  queue = run.then(() => undefined, () => undefined);
+-  return run;
++async function withLock<T>(work: () => Promise<T>): Promise<T> {
++  await mkdir(path.dirname(filePath), { recursive: true });
++  // All writers must share this local path/protocol. Never reclaim a lock by age.
++  for (let retry = 0; ; retry++) {
++    try {
++      await mkdir(lockPath);
++      break;
++    } catch (error) {
++      if (!hasCode(error, "EEXIST")) throw error;
++      if (retry >= 100) throw new Error("Progress storage lock wait timed out; check offline recovery instructions");
++      await new Promise<void>((resolve) => setTimeout(resolve, 50));
++    }
++  }
++  let workError: unknown;
++  try {
++    return await work();
++  } catch (error) {
++    workError = error;
++    throw error;
++  } finally {
++    try {
++      await rmdir(lockPath);
++    } catch (releaseError) {
++      if (workError !== undefined) throw new AggregateError([workError, releaseError], "Progress operation failed; lock release also failed");
++      throw releaseError;
++    }
++  }
+ }
+ 
+ export async function getLearner(learnerId: string): Promise<LearnerRecord> {
+--- before/apps/web/src/lib/course-certificates.test.ts
++++ after/apps/web/src/lib/course-certificates.test.ts
+@@ -10,6 +10,10 @@
+   readFile: async () => io.text,
+   mkdir: async () => undefined,
+   writeFile: async (_path: string, text: string) => { io.text = text; },
++  open: async () => ({ writeFile: async (text: string) => { io.text = text; }, close: async () => undefined }),
++  rename: async () => undefined,
++  unlink: async () => undefined,
++  rmdir: async () => undefined,
+ }));
+ vi.mock("@/lib/auth", () => ({ getSession: async () => io.session ? { learnerId: "synthetic", name: "Synthetic Learner" } : null }));
+ vi.mock("@/lib/executor", () => ({ callExecutor: async () => ({ status: io.status, stdout: "", stderr: "", truncated: false, feedback: [] }) }));
+--- /dev/null
++++ after/apps/web/src/lib/progress-storage.test.ts
+@@ -0,0 +1,132 @@
++import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
++import path from "node:path";
++
++// Every filesystem call is synthetic: never open the application's learner file.
++const disk = vi.hoisted(() => ({
++  files: new Map<string, string>(), locks: new Set<string>(),
++  readError: "", fault: "", leftovers: "",
++}));
++const failure = (code: string) => Object.assign(new Error(code), { code });
++vi.mock("node:fs/promises", () => ({
++  readFile: async (p: string) => {
++    if (disk.readError) throw failure(disk.readError);
++    if (!disk.files.has(p)) throw failure("ENOENT");
++    return disk.files.get(p)!;
++  },
++  mkdir: async (p: string, options?: { recursive?: boolean }) => {
++    if (options?.recursive) return;
++    if (disk.fault === "lock") throw failure("EACCES");
++    if (disk.locks.has(p)) throw failure("EEXIST");
++    disk.locks.add(p);
++  },
++  rmdir: async (p: string) => {
++    if (disk.fault === "release") throw failure("EACCES");
++    if (!disk.locks.delete(p)) throw failure("ENOENT");
++  },
++  writeFile: async (p: string, text: string) => { disk.files.set(p, text); },
++  open: async (p: string, flags: string) => {
++    if (disk.fault === "open") throw failure("EACCES");
++    if (flags !== "wx") throw new Error("Must create exclusively");
++    if (disk.fault === "collision") { disk.files.set(p, "someone else's temp"); disk.leftovers = p; }
++    if (disk.files.has(p)) throw failure("EEXIST");
++    disk.files.set(p, "");
++    return {
++      writeFile: async (text: string) => {
++        if (disk.fault === "write") { disk.files.set(p, "partial"); throw failure("ENOSPC"); }
++        disk.files.set(p, text);
++      },
++      close: async () => { if (disk.fault === "close") throw failure("EIO"); },
++    };
++  },
++  rename: async (from: string, to: string) => {
++    if (disk.fault === "rename" || disk.fault === "cleanup") throw failure("EIO");
++    if (path.dirname(from) !== path.dirname(to)) throw new Error("Not same directory");
++    disk.files.set(to, disk.files.get(from)!); disk.files.delete(from);
++  },
++  unlink: async (p: string) => {
++    if (disk.fault === "cleanup") throw failure("EACCES");
++    if (!disk.files.delete(p)) throw failure("ENOENT");
++  },
++}));
++
++const file = path.resolve(process.cwd(), "data/progress.json");
++const lock = `${file}.lock`;
++const a = { id: "A", courseId: "courseA", holderName: "History", title: "Original", issuedAt: "2020", skills: ["Historical skill"], extra: "keep" };
++const b = { ...a, id: "B", courseId: "courseB" };
++const original = () => ({ metadata: { version: "keep" }, learners: { learner: {
++  enrolledCourseIds: ["courseA"], passedExerciseIds: ["old-pass"], completedStepIds: ["old-step"],
++  drafts: { old: "saved" }, attempts: [{ id: "old", exerciseId: "old-pass", status: "passed", at: "2020" }],
++  assessmentPassed: true, certificate: a, certificatesByCourseId: { courseB: b }, custom: { retained: true },
++} } });
++beforeEach(() => { vi.resetModules(); disk.files.clear(); disk.locks.clear(); disk.readError = ""; disk.fault = ""; disk.leftovers = ""; disk.files.set(file, JSON.stringify(original())); });
++afterEach(() => { vi.useRealTimers(); });
++
++describe("fail-closed progress storage", () => {
++  it.each(["EACCES", "EIO"])("surfaces %s without replacing storage", async (code) => {
++    const store = await import("./progress-store"); const before = disk.files.get(file); disk.readError = code;
++    await expect(store.getLearner("learner")).rejects.toThrow(code);
++    await expect(store.enroll("learner", "new")).rejects.toThrow(code);
++    expect(disk.files.get(file)).toBe(before); expect(disk.locks.size).toBe(0);
++  });
++  it.each(["{bad", "null", "[]", "{}", '{"learners":[]}', '{"learners":{"x":null}}',
++    '{"learners":{"x":{"drafts":[]}}}', '{"learners":{"x":{"passedExerciseIds":[1]}}}',
++    '{"learners":{"x":{"certificate":{}}}}', '{"learners":{"x":{"certificatesByCourseId":{"a":null}}}}',
++    '{"learners":{"x":{"attempts":[{}]}}}', '{"learners":{"x":{"assessmentPassed":"yes"}}}',
++  ])("rejects malformed storage %s without a write", async (text) => {
++    disk.files.set(file, text); const store = await import("./progress-store");
++    await expect(store.enroll("learner", "new")).rejects.toThrow();
++    expect(disk.files.get(file)).toBe(text); expect(disk.files.size).toBe(1); expect(disk.locks.size).toBe(0);
++  });
++  it("initializes only absent storage and persists a readable enrollment", async () => {
++    disk.files.delete(file); const store = await import("./progress-store");
++    expect((await store.getLearner("new")).enrolledCourseIds).toEqual([]);
++    await store.enroll("new", "courseA");
++    expect((await store.getLearner("new")).enrolledCourseIds).toEqual(["courseA"]);
++    expect(disk.files.size).toBe(1); expect(disk.locks.size).toBe(0);
++  });
++  it.each(["open", "write", "close", "rename", "cleanup"])("leaves committed data intact on %s failure", async (fault) => {
++    const before = disk.files.get(file); disk.fault = fault; const store = await import("./progress-store");
++    await expect(store.saveDraft("learner", "new", "source")).rejects.toThrow();
++    expect(disk.files.get(file)).toBe(before); expect(disk.locks.size).toBe(0);
++    expect(disk.files.size).toBe(fault === "cleanup" ? 2 : 1);
++  });
++  it("does not delete an unowned temporary file when exclusive creation fails", async () => {
++    disk.fault = "collision"; const before = disk.files.get(file); const store = await import("./progress-store");
++    await expect(store.enroll("learner", "new")).rejects.toThrow("EEXIST");
++    expect(disk.files.get(disk.leftovers)).toBe("someone else's temp"); expect(disk.files.get(file)).toBe(before);
++  });
++  it("preserves both course credentials, unknown fields and prior progress across all mutations", async () => {
++    const store = await import("./progress-store");
++    await store.enroll("learner", "courseB"); await store.saveDraft("learner", "new", "source");
++    await store.recordAttempt("learner", "new-pass", "passed"); await store.markExplanationComplete("learner", "new-step");
++    await store.saveAssessment("learner", "courseB", true); await store.saveCertificate("learner", b);
++    const saved = JSON.parse(disk.files.get(file)!);
++    expect(saved.metadata).toEqual({ version: "keep" });
++    expect(saved.learners.learner).toMatchObject({ custom: { retained: true }, certificate: a, certificatesByCourseId: { courseA: a, courseB: b }, drafts: { old: "saved", new: "source" }, assessmentCourseIds: ["openai-api-fundamentals", "courseB"] });
++    expect(saved.learners.learner.passedExerciseIds).toEqual(["old-pass", "new-pass"]);
++    expect(saved.learners.learner.completedStepIds).toEqual(["old-step", "new-step"]);
++    expect(saved.learners.learner.attempts).toHaveLength(2);
++    expect(await store.findCertificate("A")).toEqual(a); expect(await store.findCertificate("B")).toEqual(b);
++    expect(disk.files.size).toBe(1); expect(disk.locks.size).toBe(0);
++  });
++  it("coordinates independent module instances without losing either mutation", async () => {
++    vi.useFakeTimers(); const one = await import("./progress-store"); vi.resetModules(); const two = await import("./progress-store");
++    const work = Promise.all([one.enroll("learner", "one"), two.enroll("learner", "two")]);
++    await vi.runAllTimersAsync(); await work;
++    expect((await two.getLearner("learner")).enrolledCourseIds).toEqual(["courseA", "one", "two"]);
++    expect(disk.locks.size).toBe(0);
++  });
++  it("times out without removing a potentially live lock or changing data", async () => {
++    vi.useFakeTimers(); disk.locks.add(lock); const before = disk.files.get(file); const store = await import("./progress-store");
++    const result = store.enroll("learner", "new").then(() => null, (error: Error) => error);
++    await vi.runAllTimersAsync(); expect(await result).toBeInstanceOf(Error);
++    expect((await result)?.message).toMatch(/lock.*timed out/i);
++    expect(disk.locks.has(lock)).toBe(true); expect(disk.files.get(file)).toBe(before);
++  });
++  it.each(["lock", "release"])("surfaces %s errors and never removes another owner's lock", async (fault) => {
++    disk.fault = fault; const store = await import("./progress-store");
++    await expect(store.enroll("learner", "new")).rejects.toThrow("EACCES");
++    expect(disk.locks.size).toBe(fault === "release" ? 1 : 0);
++    expect(JSON.parse(disk.files.get(file)!).learners.learner.enrolledCourseIds).toEqual(fault === "release" ? ["courseA", "new"] : ["courseA"]);
++  });
++});
+--- /dev/null
++++ after/docs/superpowers/plans/2026-10-07-progress-storage.md
+@@ -0,0 +1,61 @@
++# Fail-safe local progress storage
++
++## Scope and root cause
++
++The progress reader treated every read/parse failure as an absent file, the writer
++replaced the committed file directly, and its promise queue coordinated only one
++module instance. A later mutation could erase unreadable or concurrently updated
++learner records. Repair storage only; preserve certificate and course behavior.
++
++## Bounded design
++
++- Initialize empty only for the progress file's `ENOENT`. Reject other IO errors,
++  invalid JSON, and malformed known fields before mutation. Legacy missing fields
++  still receive existing defaults; unknown root/record/certificate fields survive.
++- Hold an exclusive `progress.json.lock` directory across read, mutate, write and
++  cleanup. Wait up to 100 intervals of 50ms on `EEXIST`, then reject visibly.
++  Other acquisition failures reject immediately. Never infer a lock is stale.
++- Open an exclusive UUID temporary file next to progress with mode `0600`; write,
++  close, then rename over committed storage. Remove only an owned temporary path
++  on failure. Cleanup/release failures remain visible, including combined errors.
++- Keep exported APIs unchanged; reads see a complete old or new file without a
++  write lock. Certificate/progress normalization remains backward-compatible.
++
++## Constraints and operations
++
++Only cooperating processes using the same absolute path on one trusted local
++filesystem are covered. Current storage resolves from `process.cwd()`; every web
++worker must use the same `apps/web` cwd and shared persistent directory. Separate
++container-local copies, rolling workers using the old direct-write protocol,
++network filesystems, hostile directory replacement, and distributed deployments
++are not covered. No fsync/power-loss/database-durability guarantee is made. Rename
++installs mode `0600`, so workers need the same OS identity or compatible access.
++
++On orphan lock/failed release: take ALL writers offline first and confirm none
++can restart (including old deployments). Preserve a restricted backup of the
++committed progress file and any relevant temporary artifacts. Diagnose permissions
++and validate JSON/schema without publishing learner data. Only an operator who
++has confirmed quiescence may remove the exact empty `progress.json.lock` directory
++(non-recursive removal). Never remove/reclaim by age or PID guess. Never replace
++corruption with an empty store. Restore a verified backup under maintenance if
++needed. Temporary leftovers are NOT committed and must not be automatically
++promoted; inspect them offline and reconcile against committed data before any
++manual recovery. Restart only after validation and compatible writer rollout.
++
++A release failure can occur after rename committed successfully; the API rejects
++but the mutation may already exist. Confirm committed state before retrying;
++attempt recording is not idempotent. Errors bubble to existing callers; polished
++learner request-error recovery remains a separate audit item.
++
++## Execution and verification
++
++1. Snapshot only the two selected existing source/test files.
++2. Add synthetic filesystem tests and run the complete web suite RED.
++3. Implement validation, atomic replacement, cross-instance locking and adapt the
++   pre-existing certificate test's synthetic filesystem surface.
++4. Run complete web suite GREEN and non-incremental TypeScript checks offline.
++5. Publish selected before/after text, full diff, SHA-256 manifest and command logs.
++
++No real learner-file reads/writes, installs, servers, builds, accounts, network,
++secrets, commits, or live filesystem lock/fault tests. Independent review remains
++required; these offline checks are not release approval or rendered QA.
+--- /dev/null
++++ after/docs/audits/progress-storage-review/README.md
+@@ -0,0 +1,52 @@
++# Progress-storage repair evidence
++
++Scope: local progress-file safety only. Product changes are `progress-store.ts`,
++synthetic `progress-storage.test.ts`, and the existing certificate test's IO mock.
++The concise design/operations plan is `docs/superpowers/plans/2026-10-07-progress-storage.md`.
++
++## Verification
++
++- Baseline: 61 web tests passed in 11 files (exit 0).
++- RED: full suite, 22 failed / 65 passed in 12 files (exit 1); expected fail-closed,
++  atomic-write, extension-field preservation and competing-instance regressions.
++  An initial timeout assertion caused an asynchronous assertion warning; it was
++  corrected before the recorded RED run, without production edits.
++- GREEN: 87 web tests passed in 12 files (exit 0).
++- TypeScript: `--noEmit --incremental false` passed (exit 0).
++- Real filesystem locking, crash/power-loss recovery, distributed deployment,
++  rendered QA and release readiness: `not_verified`.
++
++Exact execution cwd:
++`/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web`.
++
++Commands (only invocation-local OpenSSL override, no persistent environment change):
++
++```sh
++OPENSSL_CONF=/dev/null /Users/juanierace/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/vitest/vitest.mjs run
++OPENSSL_CONF=/dev/null /Users/juanierace/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/typescript/bin/tsc --noEmit --incremental false
++```
++
++`red.txt`, `green.txt`, and `typecheck.txt` retain outputs. `manifest.json` lists
++exact changed primary paths, selected before/after snapshots and their SHA-256
++hashes. `full.diff` is a complete selected-text diff relative to this batch's
++before state, NOT a Git clean-tree/entire historical diff. No real progress JSON
++was accessed. No recursive/cache snapshots or filesystem cleanup were performed.
++System `git status` was unavailable due missing developer tools; no install was
++attempted, and the review package uses explicit file snapshots rather than Git.
++
++Tests exercise the actual store using a fully mocked filesystem, including
++malformed storage, missing-file versus permission failures, write/close/rename
++faults, cleanup failure, exclusive-open collision, lock permission/release errors,
++lock timeout with fake timers, two independently imported modules, and preservation
++of historical course A/B credentials, maps, extension fields and all mutations.
++
++## Limits and recovery
++
++See the plan for mandatory offline orphan-lock recovery and single-local-filesystem
++constraints. No automatic lock reclamation or empty-store corruption recovery.
++Writes use private `0600` files and rename for atomic visibility, not fsync durability.
++A lock-release error after a committed rename rejects with potentially committed
++state; inspect before retrying non-idempotent attempts. All deployed writers must
++use this protocol and the same cwd/storage path; this is not a distributed database.
++
++Independent risk/reliability/resilience review is pending parent orchestration.

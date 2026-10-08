@@ -1,0 +1,24 @@
+id: lg-project
+title: Final project
+order: 1
+instructions:
+  - Register a draft node and set it as the entry point.
+  - Add an edge from draft to review.
+  - Compile and return the graph.
+starterCode: |
+  from langgraph.graph import StateGraph
+
+  class State(dict):
+      pass
+
+  def draft(state):
+      return state
+
+  def review(state):
+      return state
+
+  def build_graph():
+      return None
+hints:
+  - Entry point, node, edge, compile. In that order is fine as long as compile is last.
+runtime: python

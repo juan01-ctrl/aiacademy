@@ -1,0 +1,98 @@
+[
+  {
+    "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/src/grade-boundary.test.ts",
+    "relative_path": "apps/executor/src/grade-boundary.test.ts",
+    "before_sha256": null,
+    "after_sha256": "fbc510c674a3bde79c3ebc081e208c0ddc05515f0f9f39a3305be7e3fe732f7b"
+  },
+  {
+    "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/src/grade.ts",
+    "relative_path": "apps/executor/src/grade.ts",
+    "before_sha256": "20f9e0ad95d955938af6d764d8c1bc542d5ae1a48c7acc68298e8f09ce9bffbb",
+    "after_sha256": "20732e5d67bd1d4b1bd73e408d994805ca404d0b63a31a66af505112ae04499d"
+  },
+  {
+    "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/grader.py",
+    "relative_path": "apps/executor/grading/grader.py",
+    "before_sha256": "836a0285b9c2f3dabc2033a683b6038cad7d0061b3d32e19dde4bfedb39d8cad",
+    "after_sha256": "00705130a947aefee1d698d1299affdbc29760a95d765e101ab60814359ceac2"
+  },
+  {
+    "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/harness.py",
+    "relative_path": "apps/executor/grading/harness.py",
+    "before_sha256": "6a1a4721015d191744a56cbdefd35ea6216ff74479b96e73cb1df0bdfdf25ae1",
+    "after_sha256": "df3a74ef72e1d2cf5cf4a7e8f7810a250a1fa99e335df05d2855e16fdcbaa3ab"
+  },
+  {
+    "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/manifest.json",
+    "relative_path": "apps/executor/grading/manifest.json",
+    "before_sha256": "68ccf139dac183d7965e65d4dfcdfbc0a70f3ba006283b84a9ac48c0679d06a8",
+    "after_sha256": "86903a91846b552bc66d3234dbaa64041c4ddf491f07a1cc538b2421298459a8"
+  },
+  {
+    "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/mocks/agents/__init__.py",
+    "relative_path": "apps/executor/grading/mocks/agents/__init__.py",
+    "before_sha256": "a8925e6ad310dc7288f2b1503473910836c9cc093b30d6f37add0b307c63fc2f",
+    "after_sha256": "5a7ee9cd0dd0afaecbb33a485ccbe429e6ea05ed6253b4a5ddb2020382190615"
+  },
+  {
+    "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/mocks/google/adk/__init__.py",
+    "relative_path": "apps/executor/grading/mocks/google/adk/__init__.py",
+    "before_sha256": "2bbb093065e7bfa4dd5c851f9f32b4eda4cd5848bb1d405bdb32d46ca6d7f393",
+    "after_sha256": "d3a8bd78c64e79be410c6b9cc0f531236ffdf92ba36da76c7f3d8c7c993cc369"
+  },
+  {
+    "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/mocks/langgraph/graph.py",
+    "relative_path": "apps/executor/grading/mocks/langgraph/graph.py",
+    "before_sha256": "19624c86fe74efa0d3c8650b7b3fefbc5915d0967f4f52ccd93d4ec66975162f",
+    "after_sha256": "1deecfac6caf4ca2de7b929080814e563049b89bb315353e90bee24c756dc25c"
+  },
+  {
+    "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/mocks/openai/__init__.py",
+    "relative_path": "apps/executor/grading/mocks/openai/__init__.py",
+    "before_sha256": "58dbcb5ae47dfa6c8820f87887aa040c4c8f15c03ea503fb55c329bb92eaa7aa",
+    "after_sha256": "0c4d690248e516024e7f6f6c3a47270af9fc8c4e65a64172905342efb0d7a83d"
+  },
+  {
+    "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py",
+    "relative_path": "apps/executor/grading/test_contracts.py",
+    "before_sha256": null,
+    "after_sha256": "96882868861aa8cf0084ccbb54948aedf35eed4d46a226e9b54cb3cabd4f7fd1"
+  },
+  {
+    "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/tests/adk-sequence.py",
+    "relative_path": "apps/executor/grading/tests/adk-sequence.py",
+    "before_sha256": "9bb4f3f8d4eaf0ffb32366077c3e1e25eb7d0e8071f4c0fd23d62d24323332db",
+    "after_sha256": "99fce3fa60c9bd7b18cf0902a3c98e773c79320fdd6cf661701935e4c125fafb"
+  },
+  {
+    "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/tests/agents-research.py",
+    "relative_path": "apps/executor/grading/tests/agents-research.py",
+    "before_sha256": "cb76f396980ba3c4ded764c5941b51e813ae307132ee4a09d1dbf851a3194de7",
+    "after_sha256": "3ad1878c1a5b2b5d2bd68d0440522f80e4db4867081d93a1f797c16d68355ab0"
+  },
+  {
+    "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/tests/lg-checkpointer.py",
+    "relative_path": "apps/executor/grading/tests/lg-checkpointer.py",
+    "before_sha256": "ef805111e4c4b06cca33898da029d8d72b9c29f31cfbbcd62ce39f1f4aaf8878",
+    "after_sha256": "152e622456930e5b809aac3f2f71b58463dddf7c94663175090f416572f7557c"
+  },
+  {
+    "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/tests/lg-project.py",
+    "relative_path": "apps/executor/grading/tests/lg-project.py",
+    "before_sha256": "3438d5900c3cafd437774e6002b74d77f3300722d3204ebb8ed1fcf8cdb5d30a",
+    "after_sha256": "84c7d9bdafa1a3971c37a1b0a2abc087f2b66b29b0aac33cced589c8c6aadc2c"
+  },
+  {
+    "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/tests/pass-json-schema.py",
+    "relative_path": "apps/executor/grading/tests/pass-json-schema.py",
+    "before_sha256": "c09d412671257058ede2c5cd1f4e8346265d10661590a22e88fa4445672c851e",
+    "after_sha256": "3049c3e1593d37921ac4189e7b5f108faea6e73ac6992612cbd56958d4d48767"
+  },
+  {
+    "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/tests/responses-capstone.py",
+    "relative_path": "apps/executor/grading/tests/responses-capstone.py",
+    "before_sha256": "67bff12fec7bd8145b1560a32c5c7ff5d5b0b47b624a19ba4a9cb1e4a9450c94",
+    "after_sha256": "e6333e6af0af49dc75fff9c09c5b6cfbc5630fe398cc309535ca6873d24f0543"
+  }
+]

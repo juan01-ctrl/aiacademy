@@ -1,0 +1,19 @@
+id: pass-bounded-call
+title: Pass both knobs
+order: 11
+instructions:
+  - Complete ask_bounded so temperature and max_output_tokens both reach responses.create.
+  - Return response.output_text.
+starterCode: |
+  from openai import OpenAI
+
+  def ask_bounded(prompt: str, temperature: float, limit: int) -> str:
+      client = OpenAI()
+      response = client.responses.create(
+          model="gpt-4.1-mini",
+          input=prompt,
+      )
+      return ""
+hints:
+  - temperature and max_output_tokens are separate arguments.
+runtime: python

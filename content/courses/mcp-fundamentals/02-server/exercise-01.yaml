@@ -1,0 +1,15 @@
+id: mcp-register-tool
+title: Expose get_weather
+order: 1
+instructions:
+  - Create a FastMCP server named weather.
+  - Register a function named get_weather with mcp.tool().
+  - Return the server.
+starterCode: |
+  from mcp.server.fastmcp import FastMCP
+
+  def build_server():
+      return None
+hints:
+  - Decorate the function after the server exists.
+runtime: python

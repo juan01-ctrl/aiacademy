@@ -1,0 +1,51 @@
+id: what-is-adk
+title: What is ADK
+summary: An open agent framework. Start with one agent, a model, an instruction, and a tool.
+durationMinutes: 16
+steps:
+  - id: adk-what
+    type: explanation
+    title: What is ADK
+    body:
+      - "ADK is Google's open-source framework for building agents. The first object is an Agent with a name, a model, an instruction, and a list of tools."
+      - "The home-page researcher uses model gemini-flash-latest, an instruction about researching, and google_search as a tool."
+      - "It is another framework for the same job you already did by hand. The loop is inside the runtime. You declare the agent."
+    takeaway: An ADK agent is a name, a model, an instruction, and tools.
+    example: |
+      from google.adk import Agent
+      from google.adk.tools import google_search
+
+      agent = Agent(
+          name="researcher",
+          model="gemini-flash-latest",
+          instruction="You help users research topics thoroughly.",
+          tools=[google_search],
+      )
+  - id: adk-for
+    type: explanation
+    title: What is it used for
+    body:
+      - "Use it when you want a managed agent on Gemini, with tools, and later a team or a graph. The first step is still one agent."
+      - "The same week also tours other frameworks. The shape stays familiar. A model, instructions, tools, and a run."
+      - "Do not start here if you have not seen a tool loop. ADK hides that loop."
+    takeaway: Use ADK when you want Google's runtime to own the loop.
+    example: |
+      tools=[google_search]
+  - id: adk-plan
+    type: explanation
+    title: What you will practice
+    body:
+      - "You will create the researcher from the home-page example. Name, model, instruction, and google_search."
+      - "You will not deploy it. Deployment comes after the agent exists."
+    takeaway: Declare the researcher. Do not write the loop.
+    example: |
+      Agent(name="researcher", model="gemini-flash-latest", instruction="...", tools=[google_search])
+  - id: adk-before
+    type: explanation
+    title: Before the editor
+    body:
+      - "instruction is the standing rule, like instructions on an OpenAI agent. tools is the list the model may request."
+      - "google_search is imported from google.adk.tools. Pass it in the list. Do not call it yourself."
+    takeaway: Next you will construct the researcher.
+    example: |
+      from google.adk.tools import google_search

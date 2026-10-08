@@ -1,0 +1,44 @@
+id: first-node
+title: A node updates state
+summary: A node is a function. It reads the shared state and returns an update.
+durationMinutes: 18
+steps:
+  - id: lg-state-is-shared
+    type: explanation
+    title: State is shared
+    body:
+      - "State is the object every node can read. A node does not receive only the previous return value. It sees the same state the other nodes see."
+      - "A node returns a partial update. draft can return notes with one new line. It does not rebuild the whole application."
+      - "If there is no state, the arrows have nothing to carry. review cannot read what draft wrote."
+    takeaway: Nodes update state. They do not replace the whole program.
+    example: |
+      def draft(state):
+          return {"notes": ["drafted"]}
+  - id: lg-register-the-node
+    type: explanation
+    title: Register the node
+    body:
+      - "Build in this order. Create the StateGraph. Register the node with add_node. Connect START to that node. Connect the node to END. Then compile."
+      - "add_edge(START, \"draft\") names the first node. set_entry_point(\"draft\") is the short form of that same start. This exercise grades the short form."
+      - "compile checks the graph. Until you compile, invoke has nothing to run."
+    takeaway: State, node, edge from START, then compile.
+    example: |
+      graph = StateGraph(State)
+      graph.add_node("draft", draft)
+      graph.add_edge(START, "draft")
+      graph.add_edge("draft", END)
+      graph.compile()
+  - id: lg-compile-is-required
+    type: explanation
+    title: Compile is required
+    body:
+      - "add_node only records the function under a name. The graph cannot run yet."
+      - "set_entry_point names where invoke starts. A graph with nodes and no entry point does not know the first step."
+      - "compile is part of building, not of the node. Call it after the nodes and the start are set."
+    takeaway: Entry point, then compile.
+    example: |
+      graph.set_entry_point("draft")
+      graph.compile()
+  - id: lg-practice-node
+    type: exercise
+    exerciseId: lg-add-node

@@ -1,0 +1,42 @@
+id: bounded-call
+title: A bounded call still fails
+summary: Temperature and a token cap change the request. They do not replace the blank check or the try block.
+durationMinutes: 18
+steps:
+  - id: oa-tokens-cost
+    type: explanation
+    title: Tokens are the bill
+    body:
+      - "The API charges for input tokens and output tokens. A longer prompt and a longer reply both cost more."
+      - "max_output_tokens caps the reply. A classifier that only needs positive or negative can pass a small cap so a paragraph is not billed as the label."
+      - "The cap does not make a blank prompt valid. An empty input is still a request if you send it."
+    takeaway: The limit is max_output_tokens. The bill follows the tokens.
+    example: |
+      max_output_tokens=8
+  - id: oa-combine-knobs
+    type: explanation
+    title: Knobs stack
+    body:
+      - "temperature and max_output_tokens are independent arguments. One controls sampling. The other caps length."
+      - "You still return output_text. The knobs change the request. They do not change the field you read."
+    takeaway: Pass both arguments, then return the text.
+    example: |
+      client.responses.create(
+          model="gpt-4.1-mini",
+          input=prompt,
+          temperature=temperature,
+          max_output_tokens=limit,
+      )
+  - id: oa-guard-still-applies
+    type: explanation
+    title: The guard still comes first
+    body:
+      - "A bounded call is still a call. If the prompt is blank, return before you send it."
+      - "If create raises, catch it and return an empty string. The token cap does not catch that exception for you."
+    takeaway: Limits do not replace the failure paths.
+    example: |
+      if not prompt.strip():
+          return ""
+  - id: oa-practice-bounded
+    type: exercise
+    exerciseId: pass-bounded-call

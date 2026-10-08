@@ -1,0 +1,44 @@
+id: owned-task
+title: A task needs an owner
+summary: An agent is a role, a goal, and a backstory. A task is the work, assigned to that agent.
+durationMinutes: 18
+steps:
+  - id: crew-role
+    type: explanation
+    title: A role is not a prompt dump
+    body:
+      - "An agent is the person on the team. role is the name other tasks use. goal is the outcome. backstory is how the agent speaks. It does not define the deliverable."
+      - "A researcher has a role, a goal, and a backstory. The work is not stored on the agent. The work is the task."
+      - "Create the researcher before the task. A task cannot own an agent that does not exist yet."
+    takeaway: Create a researcher before you assign research.
+    example: |
+      researcher = Agent(
+          role="researcher",
+          goal="Find the source",
+          backstory="You find relevant information and present it clearly.",
+      )
+  - id: crew-assign
+    type: explanation
+    title: Assign the task
+    body:
+      - "A task has a description, an expected output, and an agent. description is the work. expected_output is what done looks like, such as a markdown report."
+      - "agent is the owner. A task with no agent cannot run inside a crew."
+    takeaway: Pass the researcher as agent.
+    example: |
+      Task(
+          description="Collect notes",
+          expected_output="A short list of notes.",
+          agent=researcher,
+      )
+  - id: crew-description-is-the-work
+    type: explanation
+    title: The description is the work
+    body:
+      - "This exercise wants the description Collect notes and the role researcher. Those strings are the contract."
+      - "Putting the work only in the backstory does not assign it. The task description is what must be done."
+    takeaway: Assign the task to the researcher you just created.
+    example: |
+      Task(description="Collect notes", agent=researcher)
+  - id: crew-practice-task
+    type: exercise
+    exerciseId: crew-assign-task

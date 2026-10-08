@@ -1,0 +1,89 @@
+{
+  "return-output-text": {
+    "entry": "ask_llm",
+    "args": ["ping"]
+  },
+  "pass-the-model": {
+    "entry": "ask_with_model",
+    "args": ["ping", "gpt-4.1-mini"]
+  },
+  "pass-instructions": {
+    "entry": "ask_with_instructions",
+    "args": ["ping", "Answer in one word."]
+  },
+  "pass-tools": {
+    "entry": "ask_with_tool",
+    "args": ["ping", [{"type": "function", "name": "get_weather"}]]
+  },
+  "pass-json-schema": {
+    "entry": "ask_for_json",
+    "args": ["ping", {"format": {"type": "json_schema", "name": "answer"}}]
+  },
+  "catch-api-error": {
+    "entry": "ask_llm",
+    "calls": [
+      { "args": ["ping"] },
+      { "args": ["__academy_fail__"] }
+    ]
+  },
+  "pass-temperature": {
+    "entry": "ask_with_temperature",
+    "args": ["ping", 0]
+  },
+  "lg-add-node": { "entry": "build_graph", "args": [] },
+  "lg-route": { "entry": "build_graph", "args": [] },
+  "lg-project": { "entry": "build_graph", "args": [] },
+  "lg-checkpointer": { "entry": "build_graph", "args": [true] },
+  "rag-empty": { "entry": "cite", "args": ["missing"] },
+  "crew-sequential": { "entry": "run_sequential", "args": [] },
+  "rag-index-chunks": { "entry": "index_document", "args": ["Paris is the capital.\n\nLyon is a city."] },
+  "rag-cite": { "entry": "cite", "args": ["capital"] },
+  "rag-project": { "entry": "answer_from_doc", "args": ["Paris is the capital.\n\nLyon is a city.", "capital"] },
+  "crew-assign-task": { "entry": "build_task", "args": [] },
+  "crew-kickoff": { "entry": "run_crew", "args": [] },
+  "crew-project": { "entry": "run_research", "args": [] },
+  "responses-capstone": {
+    "entry": "ask_llm",
+    "calls": [
+      { "args": ["ping"] },
+      { "args": ["   "] },
+      { "args": ["__academy_fail__"] }
+    ]
+  },
+  "pass-few-shot": {
+    "entry": "ask_with_example",
+    "args": ["capital of Spain?", "Q: capital of France? A: Paris"]
+  },
+  "pass-max-output-tokens": {
+    "entry": "ask_with_limit",
+    "args": ["ping", 32]
+  },
+  "pass-bounded-call": {
+    "entry": "ask_bounded",
+    "args": ["ping", 0, 32]
+  },
+  "agents-build": { "entry": "build_agent", "args": [] },
+  "agents-run": { "entry": "run_agent", "args": ["Write a haiku about recursion in programming."] },
+  "agents-project": { "entry": "run_assistant", "args": ["Write a haiku about recursion in programming."] },
+  "agents-handoff": { "entry": "build_sales_team", "args": [] },
+  "mcp-register-tool": { "entry": "build_server", "args": [] },
+  "mcp-project": { "entry": "expose_weather", "args": [] },
+  "adk-build": { "entry": "build_agent", "args": [] },
+  "adk-project": { "entry": "build_researcher", "args": [] },
+  "agent-loop": { "entry": "run_until_done", "args": [] },
+  "agent-loop-project": { "entry": "achieve", "args": ["book a table"] },
+  "agent-chain": { "entry": "chain", "args": ["What is RAG"] },
+  "agent-route": { "entry": "route", "args": ["billing"] },
+  "crew-context": { "entry": "build_writer", "args": [] },
+  "lg-chain": { "entry": "build_chain", "args": [] },
+  "mcp-resource": { "entry": "add_notes", "args": [] },
+  "adk-sequence": { "entry": "build_pipeline", "args": [] },
+  "agents-research": { "entry": "build_research_team", "args": [] },
+  "skip-blank-prompt": {
+    "entry": "ask_llm",
+    "calls": [
+      { "args": ["ping"] },
+      { "args": ["   "] }
+    ]
+  }
+}

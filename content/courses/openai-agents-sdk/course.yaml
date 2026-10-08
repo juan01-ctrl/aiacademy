@@ -1,0 +1,10 @@
+id: openai-agents-sdk
+title: OpenAI Agents SDK
+summary: An Agent has instructions and tools. Runner.run_sync runs the loop and returns final_output.
+level: Intermediate
+durationMinutes: 70
+moduleIds:
+  - what-it-is
+  - first-agent
+  - handoffs
+  - research-team

@@ -1,0 +1,10 @@
+
+ RUN  v3.2.7 /Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy
+
+ ✓ apps/web/src/components/workspace/learner-requests.test.tsx (36 tests) 26ms
+
+ Test Files  1 passed (1)
+      Tests  36 passed (36)
+   Start at  17:13:27
+   Duration  446ms (transform 67ms, setup 0ms, collect 102ms, tests 26ms, environment 0ms, prepare 75ms)
+

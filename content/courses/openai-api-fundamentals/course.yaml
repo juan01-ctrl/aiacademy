@@ -1,0 +1,9 @@
+id: openai-api-fundamentals
+title: OpenAI API Fundamentals
+summary: Call the Responses API, control the response, and survive a bad prompt or a raised error.
+level: Basic
+durationMinutes: 180
+moduleIds:
+  - introduction
+  - control
+  - reliability

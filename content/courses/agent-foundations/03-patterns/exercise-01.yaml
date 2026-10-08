@@ -1,0 +1,15 @@
+id: agent-chain
+title: Feed the draft forward
+order: 2
+instructions:
+  - Call draft with the prompt.
+  - Pass that return value to judge.
+  - Return what judge returns.
+starterCode: |
+  from academy_loop import draft, judge
+
+  def chain(prompt: str) -> str:
+      return draft(prompt)
+hints:
+  - judge should not see the original prompt.
+runtime: python

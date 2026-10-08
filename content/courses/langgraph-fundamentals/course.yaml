@@ -1,0 +1,10 @@
+id: langgraph-fundamentals
+title: LangGraph Fundamentals
+summary: Build a stateful graph. Start with a node, then route the next step from the state.
+level: Intermediate
+durationMinutes: 82
+moduleIds:
+  - introduction
+  - chain
+  - routing
+  - memory

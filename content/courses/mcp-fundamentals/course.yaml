@@ -1,0 +1,9 @@
+id: mcp-fundamentals
+title: Model Context Protocol
+summary: MCP is the standard that lets an agent call tools on a server you did not hard-code into the agent.
+level: Advanced
+durationMinutes: 50
+moduleIds:
+  - what-it-is
+  - server
+  - resource

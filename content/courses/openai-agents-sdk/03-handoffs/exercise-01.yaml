@@ -1,0 +1,19 @@
+id: agents-handoff
+title: Manager and tool
+order: 3
+instructions:
+  - Decorate send_email with function_tool.
+  - Create an email agent that uses that tool.
+  - Create a Sales manager whose handoffs list contains the email agent.
+  - Return the manager.
+starterCode: |
+  from agents import Agent, function_tool
+
+  def send_email(to: str) -> str:
+      return "sent"
+
+  def build_sales_team():
+      return None
+hints:
+  - handoffs=[email_agent] goes on the manager, not on the specialist.
+runtime: python

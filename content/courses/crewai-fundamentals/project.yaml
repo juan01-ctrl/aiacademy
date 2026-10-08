@@ -1,0 +1,14 @@
+id: crew-project
+title: Final project
+order: 1
+instructions:
+  - Create a researcher agent and a task assigned to that agent.
+  - Put both in a crew and return kickoff.
+starterCode: |
+  from crewai import Agent, Crew, Task
+
+  def run_research():
+      return ""
+hints:
+  - Agent, Task, Crew, kickoff.
+runtime: python

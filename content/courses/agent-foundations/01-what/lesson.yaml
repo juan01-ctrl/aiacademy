@@ -1,0 +1,47 @@
+id: what-is-an-agent
+title: What is an agent
+summary: A model that can ask for tools, in a loop, until the goal is done.
+durationMinutes: 16
+steps:
+  - id: agent-what
+    type: explanation
+    title: What is an agent
+    body:
+      - "An agent is a model with tools, running in a loop, to achieve a goal. The model does not run your functions. It returns text that asks for a tool. Your code runs the tool and calls the model again."
+      - "A workflow is the other shape. You wrote the path in advance. One call feeds the next. The model does not choose the next step."
+      - "Use an agent when the next step depends on what the model just found. Use a workflow when the order is known and you need the same path every time."
+    takeaway: Agent means tools in a loop. Workflow means a path you already wrote.
+    example: |
+      while step["tool"] != "done":
+          run_tool(step["tool"])
+          step = llm(messages)
+  - id: agent-patterns
+    type: explanation
+    title: What the patterns are for
+    body:
+      - "Prompt chaining splits one job into smaller model calls. The output of one call is the input of the next."
+      - "Routing sends the request to a specialist. A technical question goes to one prompt. A billing question goes to another."
+      - "An orchestrator asks a model to break the job up and hand pieces to workers. An evaluator checks the result and can send it back."
+    takeaway: Name the pattern before you add another agent.
+    example: |
+      if kind == "billing":
+          return billing_llm(text)
+      return tech_llm(text)
+  - id: agent-when
+    type: explanation
+    title: What you will practice
+    body:
+      - "You will write the loop yourself. Call the model. If it asks for a tool, run that tool. Call the model again. Stop when the tool name is done."
+      - "Frameworks hide this loop. You need to see it once before CrewAI, the Agents SDK, or LangGraph."
+    takeaway: Next you will run the loop until the model is done.
+    example: |
+      return step["text"]
+  - id: agent-before
+    type: explanation
+    title: Before the editor
+    body:
+      - "llm returns a dict with tool and text. run_tool runs the tool the model named."
+      - "Do not stop after the first call if tool is not done. That is a single prompt, not an agent."
+    takeaway: Loop until tool is done, then return the text.
+    example: |
+      step = llm([goal])

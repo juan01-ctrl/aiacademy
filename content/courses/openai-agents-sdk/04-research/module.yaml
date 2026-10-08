@@ -1,0 +1,5 @@
+id: research-team
+title: A research team
+durationMinutes: 14
+lessonIds:
+  - planner-and-writer

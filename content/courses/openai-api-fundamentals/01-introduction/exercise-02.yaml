@@ -1,0 +1,16 @@
+id: pass-the-model
+title: Pass the model through
+order: 2
+instructions:
+  - Send prompt and model into responses.create.
+  - Return response.output_text.
+  - The model argument must be the value the caller passed in.
+starterCode: |
+  from openai import OpenAI
+
+  def ask_with_model(prompt: str, model: str) -> str:
+      client = OpenAI()
+      return ""
+hints:
+  - responses.create accepts model and input as keyword arguments.
+runtime: python

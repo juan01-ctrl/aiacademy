@@ -1,0 +1,5 @@
+id: routing
+title: Route the next step
+durationMinutes: 14
+lessonIds:
+  - conditional-edge

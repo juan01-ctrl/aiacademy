@@ -1,0 +1,9 @@
+id: agent-foundations
+title: What an agent is
+summary: An agent is a model calling tools in a loop until a goal is done. A workflow is a path you wrote in advance.
+level: Basic
+durationMinutes: 62
+moduleIds:
+  - what-it-is
+  - the-loop
+  - patterns

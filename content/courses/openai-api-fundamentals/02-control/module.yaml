@@ -1,0 +1,8 @@
+id: control
+title: Control the response
+durationMinutes: 66
+lessonIds:
+  - structured-json
+  - temperature
+  - call-a-tool
+  - shots-and-limits

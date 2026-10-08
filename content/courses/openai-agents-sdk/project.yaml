@@ -1,0 +1,15 @@
+id: agents-project
+title: Run the Assistant
+order: 1
+instructions:
+  - Create an Agent named Assistant with instructions You are a helpful assistant.
+  - Call Runner.run_sync with the prompt.
+  - Return result.final_output.
+starterCode: |
+  from agents import Agent, Runner
+
+  def run_assistant(prompt: str) -> str:
+      return ""
+hints:
+  - Construct, run, return final_output.
+runtime: python

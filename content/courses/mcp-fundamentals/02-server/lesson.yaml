@@ -1,0 +1,28 @@
+id: register-tool
+title: Register the tool
+summary: The server name and the function name are the contract a client uses.
+durationMinutes: 14
+steps:
+  - id: mcp-server-name
+    type: explanation
+    title: The server has a name
+    body:
+      - "FastMCP(\"weather\") creates the server. The name is how a client finds this set of tools."
+      - "A server with no registered tool has a port and nothing behind it."
+    takeaway: Create the server before you decorate the function.
+    example: |
+      mcp = FastMCP("weather")
+  - id: mcp-tool-name
+    type: explanation
+    title: The function name is the tool name
+    body:
+      - "mcp.tool() publishes the function. get_weather is the name the model will request. city is the argument."
+      - "Decorating a function and never attaching it to a server does not expose it."
+    takeaway: Decorate get_weather on the weather server.
+    example: |
+      @mcp.tool()
+      def get_weather(city: str) -> str:
+          return "sunny"
+  - id: mcp-practice
+    type: exercise
+    exerciseId: mcp-register-tool

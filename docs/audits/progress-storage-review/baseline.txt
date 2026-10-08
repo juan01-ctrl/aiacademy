@@ -1,0 +1,3 @@
+Command: OPENSSL_CONF=/dev/null /Users/juanierace/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/vitest/vitest.mjs run
+Cwd: /Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web
+Baseline before any product/test edits: 61 tests passed, 11 files passed; exit 0. Output observed directly; this file is a concise transcription. No real learner data accessed.

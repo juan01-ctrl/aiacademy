@@ -1,0 +1,22 @@
+id: lg-checkpointer
+title: Compile with a checkpointer
+order: 1
+instructions:
+  - Register a node named draft and set it as the entry point.
+  - Compile with checkpointer set to the saver you were given.
+  - Return the compiled graph.
+starterCode: |
+  from langgraph.graph import StateGraph
+
+  class State(dict):
+      pass
+
+  def draft(state):
+      return state
+
+  def build_graph(saver):
+      graph = StateGraph(State)
+      return graph.compile()
+hints:
+  - compile accepts checkpointer. Pass the saver through. Do not ignore it.
+runtime: python

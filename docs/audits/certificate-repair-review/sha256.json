@@ -1,0 +1,14 @@
+{
+  "apps/web/src/lib/progress-store.ts": "b1bcaff0b17a2fc6192ac81c1d11cba14ffd1304fa0e42da9e863debefded27e",
+  "apps/web/src/app/api/execute/route.ts": "9a660d54508b48c043c4e152ad01e980573ed767f3106480fc4ffc2aa22523c0",
+  "apps/web/src/components/workspace/Workspace.tsx": "e1871e3530e62adfcaa7b843d0d6fa06c19d23309d77882327e17a259989c223",
+  "apps/web/src/components/course/CourseOverview.tsx": "b00bc4675ec3ad3e8419f5260c09acc0fec0d679f2662f2dfba07a7076112406",
+  "apps/web/src/app/courses/[courseId]/project/page.tsx": "c60218d6b4bd76d1515b2c6d0f9332342b6fc90a8154231aa80964e0889c9edc",
+  "packages/shared/src/index.ts": "bfe7cc2c918086a8bc567ff2ae5ce24d344f57c06d8233c341841a348895a0f9",
+  "apps/web/src/components/course/CourseOverview.test.tsx": "b38d704cde9d8bf8e9cbbac28b73b17c966d66a2da9f0ec462f17d4d967300a9",
+  "apps/web/src/lib/course-certificate.ts": "a7ea05d68d98b56ebca5b4ebd4c179fd03998f2f2f31edf032daf6e6b53a2392",
+  "apps/web/src/lib/course-certificates.test.ts": "c8d324adfc879f42ff0c98f95b84cbf25171851eaa01cf168086662e3d26658c",
+  "apps/web/src/components/workspace/workspace-navigation.ts": "51d66e65eaa00bb10f9dd140f9b84c87ae87d0fe4e5adad39ac6d90482ce7567",
+  "apps/web/src/components/workspace/workspace-navigation.test.ts": "6eaf3f1bc1465ec983e753f599b28d1875b62fa6317db50eb2b9fbaa591251f5",
+  "apps/web/src/app/courses/[courseId]/project/ProjectPage.test.tsx": "d5120ae83cf3c83688ade7e45b7ef37ce090ff9dc9976665ddc4f1bd63db0589"
+}

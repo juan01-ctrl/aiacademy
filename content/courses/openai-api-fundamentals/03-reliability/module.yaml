@@ -1,0 +1,7 @@
+id: reliability
+title: When the call fails
+durationMinutes: 50
+lessonIds:
+  - blank-prompts
+  - when-the-call-fails
+  - bounded-call

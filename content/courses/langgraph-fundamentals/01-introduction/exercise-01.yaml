@@ -1,0 +1,21 @@
+id: lg-add-node
+title: Register a draft node
+order: 1
+instructions:
+  - Build a StateGraph with a node named draft.
+  - Set draft as the entry point and compile the graph.
+  - Return the compiled graph.
+starterCode: |
+  from langgraph.graph import StateGraph
+
+  class State(dict):
+      pass
+
+  def draft(state):
+      return {"notes": ["drafted"]}
+
+  def build_graph():
+      return None
+hints:
+  - The node name is the string "draft". Compile after the entry point is set.
+runtime: python

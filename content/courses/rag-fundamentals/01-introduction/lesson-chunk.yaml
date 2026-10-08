@@ -1,0 +1,49 @@
+id: split-and-add
+title: Split before you index
+summary: Indexing loads a file, splits it, embeds the chunks, and stores them. Search needs those chunks.
+durationMinutes: 22
+steps:
+  - id: rag-why-chunks
+    type: explanation
+    title: Why chunks
+    body:
+      - "A whole file is a poor unit to search. The useful sentence is buried next to paragraphs that do not answer the question."
+      - "Split because a large chunk is harder to rank, may not fit in the prompt, and spends tokens you do not need. A chunk should be long enough to answer and short enough that a match means something."
+      - "This exercise splits on blank lines, which you can see. A handbook with two paragraphs becomes two chunks. Drop empty parts. An empty chunk matches nothing."
+    takeaway: Split on blank lines before you add text to the index.
+    example: |
+      chunks = [part.strip() for part in document.split("\n\n") if part.strip()]
+  - id: rag-embed-before-store
+    type: explanation
+    title: Embed, then store
+    body:
+      - "Indexing has four steps. Load the file. Split it into chunks. Embed each chunk. Store the chunks and their embeddings."
+      - "An embedding is a list of numbers that captures the meaning of a chunk. Similar meanings land close together. Search compares those numbers, so capital can match Paris is the capital even when the words are not identical."
+      - "Index.add is the store step here. A vector store does the same job. It saves the chunk and its numbers. You still split before that call."
+    takeaway: Chunk first. The index stores passages, not the raw file.
+    example: |
+      chunks = split(document)
+      index.add(chunks)
+  - id: rag-add-them
+    type: explanation
+    title: Add them
+    body:
+      - "Index.add stores the list you will search later. It does not split for you."
+      - "Adding the raw document stores one item. Search can only return that one item, so the useful paragraph stays hidden."
+    takeaway: Call index.add with the chunk list.
+    example: |
+      index = Index()
+      index.add(chunks)
+  - id: rag-do-not-add-the-file
+    type: explanation
+    title: Do not add the raw file
+    body:
+      - "The exercise document has two paragraphs separated by a blank line. The stored list should have two chunks, not one."
+      - "Split, drop empty parts, then add. If you add the original string, you skipped the split."
+    takeaway: Split, drop empties, then add.
+    example: |
+      chunks = [part.strip() for part in document.split("\n\n") if part.strip()]
+      index.add(chunks)
+  - id: rag-practice-chunks
+    type: exercise
+    exerciseId: rag-index-chunks

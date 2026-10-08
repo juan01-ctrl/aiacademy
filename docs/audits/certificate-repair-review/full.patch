@@ -1,0 +1,472 @@
+--- a/apps/web/src/lib/progress-store.ts
++++ b/apps/web/src/lib/progress-store.ts
+@@ -26,6 +26,7 @@
+   assessmentPassed: boolean;
+   assessmentCourseIds: string[];
+   certificate: CertificateRecord | null;
++  certificatesByCourseId: Record<string, CertificateRecord>;
+ };
+ 
+ type FileShape = {
+@@ -36,6 +37,9 @@
+ let queue: Promise<unknown> = Promise.resolve();
+ 
+ function normalize(record: Partial<LearnerRecord> | undefined): LearnerRecord {
++  const certificatesByCourseId = { ...record?.certificatesByCourseId };
++  const legacy = record?.certificate;
++  if (legacy && !certificatesByCourseId[legacy.courseId]) certificatesByCourseId[legacy.courseId] = legacy;
+   return {
+     enrolledCourseIds: record?.enrolledCourseIds ?? [],
+     passedExerciseIds: record?.passedExerciseIds ?? [],
+@@ -45,6 +49,7 @@
+     assessmentPassed: record?.assessmentPassed ?? false,
+     assessmentCourseIds: record?.assessmentCourseIds ?? (record?.assessmentPassed ? ["openai-api-fundamentals"] : []),
+     certificate: record?.certificate ?? null,
++    certificatesByCourseId,
+   };
+ }
+ 
+@@ -138,7 +143,9 @@
+   return withLock(async () => {
+     const store = await readStore();
+     const current = normalize(store.learners[learnerId]);
+-    current.certificate = certificate;
++    if (current.certificatesByCourseId[certificate.courseId]) return current;
++    current.certificatesByCourseId[certificate.courseId] = certificate;
++    current.certificate ??= certificate;
+     store.learners[learnerId] = current;
+     await writeStore(store);
+     return current;
+@@ -148,6 +155,9 @@
+ export async function findCertificate(id: string): Promise<CertificateRecord | null> {
+   const store = await readStore();
+   for (const learner of Object.values(store.learners)) {
++    for (const certificate of Object.values(learner.certificatesByCourseId ?? {})) {
++      if (certificate.id === id) return certificate;
++    }
+     if (learner.certificate?.id === id) return learner.certificate;
+   }
+   return null;
+--- a/apps/web/src/app/api/execute/route.ts
++++ b/apps/web/src/app/api/execute/route.ts
+@@ -3,11 +3,12 @@
+ import { isCourseComplete, isUnlocked } from "@academy/course-engine";
+ import { shouldRecordAttempt } from "@academy/exercise-engine";
+ import { canIssueCertificate } from "@academy/grading";
+-import { CERTIFICATE_SKILLS, CERTIFICATE_TITLE, credentialId } from "@academy/shared";
++import { certificateMetadata, credentialId } from "@academy/shared";
+ import { getSession } from "@/lib/auth";
+ import { findCatalogByExercise, findExercise } from "@/lib/catalog";
+ import { callExecutor } from "@/lib/executor";
+ import { getLearner, recordAttempt, saveCertificate, saveDraft } from "@/lib/progress-store";
++import { courseCertificate } from "@/lib/course-certificate";
+ 
+ export async function POST(request: Request) {
+   const session = await getSession();
+@@ -38,19 +39,21 @@
+   const progress = shouldRecordAttempt(mode)
+     ? await recordAttempt(session.learnerId, exercise.id, result.status)
+     : learner;
+-  if (isProject && result.status === "passed" && canIssueCertificate({
+-    courseComplete: true,
++  let certificateHref: string | null = null;
++  if (mode === "submit" && isProject && result.status === "passed" && canIssueCertificate({
++    courseComplete: isCourseComplete(catalog, progress),
+     assessmentPassed: progress.assessmentCourseIds.includes(catalog.course.id),
+     projectPassed: true,
+-  }) && !progress.certificate) {
+-    await saveCertificate(session.learnerId, {
++  })) {
++    const persisted = courseCertificate(progress, catalog.course.id) ? progress : await saveCertificate(session.learnerId, {
+       id: credentialId(session.learnerId, catalog.course.id),
+       courseId: catalog.course.id,
+       holderName: session.name,
+-      title: CERTIFICATE_TITLE,
++      ...certificateMetadata(catalog.course.id, catalog.course.title),
+       issuedAt: new Date().toISOString(),
+-      skills: CERTIFICATE_SKILLS,
+     });
++    const certificate = courseCertificate(persisted, catalog.course.id);
++    certificateHref = certificate ? `/certificate/${certificate.id}` : null;
+   }
+-  return NextResponse.json({ result, passedExerciseIds: progress.passedExerciseIds });
++  return NextResponse.json({ result, passedExerciseIds: progress.passedExerciseIds, certificateHref });
+ }
+--- a/apps/web/src/components/workspace/Workspace.tsx
++++ b/apps/web/src/components/workspace/Workspace.tsx
+@@ -4,6 +4,7 @@
+ import { useState } from "react";
+ import type { ExecutionResult } from "@academy/contracts";
+ import type { PublicExercise } from "@academy/course-engine";
++import { submissionNavigation } from "./workspace-navigation";
+ 
+ const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
+ 
+@@ -24,7 +25,8 @@
+   const [pending, setPending] = useState<"run" | "submit" | null>(null);
+   const [result, setResult] = useState<ExecutionResult | null>(null);
+   const [hintsShown, setHintsShown] = useState(0);
+-  const [done, setDone] = useState(passed);
++  const [navigation, setNavigation] = useState({ done: passed, nextHref });
++  const { done } = navigation;
+ 
+   async function execute(mode: "run" | "submit") {
+     setPending(mode);
+@@ -40,7 +42,7 @@
+       return;
+     }
+     setResult(body.result);
+-    if (body.result.status === "passed") setDone(true);
++    setNavigation((current) => submissionNavigation(current, mode, body));
+   }
+ 
+   const failed = result && !done && result.status !== "ok";
+@@ -88,8 +90,8 @@
+           <button type="button" className="btn btn-secondary ml-auto" disabled={pending !== null} onClick={() => execute("run")}>
+             {pending === "run" ? "Running" : "Run code"}
+           </button>
+-          {done && nextHref ? (
+-            <a href={nextHref} className="btn btn-primary">Continue</a>
++          {done && navigation.nextHref ? (
++            <a href={navigation.nextHref} className="btn btn-primary">Continue</a>
+           ) : (
+             <button type="button" className="btn btn-primary" disabled={pending !== null} onClick={() => execute("submit")}>
+               {pending === "submit" ? "Submitting" : "Submit answer"}
+--- a/apps/web/src/components/course/CourseOverview.tsx
++++ b/apps/web/src/components/course/CourseOverview.tsx
+@@ -3,11 +3,13 @@
+ import type { getLearner } from "@/lib/progress-store";
+ import { formatDuration } from "@/lib/catalog";
+ import { EnrollButton } from "@/components/course/EnrollButton";
++import { courseCertificate } from "@/lib/course-certificate";
+ 
+ type Learner = Awaited<ReturnType<typeof getLearner>>;
+ 
+ export function CourseOverview({ catalog, learner }: { catalog: PublishedCatalog; learner?: Learner }) {
+   const courseId = catalog.course.id;
++  const certificate = courseCertificate(learner, courseId);
+   const enrolled = learner?.enrolledCourseIds.includes(courseId) ?? false;
+   const lessonsDone = learner ? isCourseComplete(catalog, learner) : false;
+   const projectDone = learner?.passedExerciseIds.includes(catalog.project?.id ?? "") ?? false;
+@@ -56,7 +58,7 @@
+         {lessonsDone ? <Link className="w-fit rounded-md border border-line px-4 py-2 font-semibold" href={`/courses/${courseId}/assessment`}>Open assessment</Link> : null}
+         <p>{learner.assessmentCourseIds.includes(courseId) ? "Final project is open." : "Pass the assessment to unlock the project."}</p>
+         {learner.assessmentCourseIds.includes(courseId) && catalog.project ? <Link className="w-fit rounded-md border border-line px-4 py-2 font-semibold" href={`/courses/${courseId}/project`}>Open final project</Link> : null}
+-        {learner.certificate ? <Link className="w-fit font-semibold text-navy underline" href={`/certificate/${learner.certificate.id}`}>Certificate {learner.certificate.id}</Link> : <p className="text-muted">{projectDone ? "Certificate pending." : "Certificate unlocks after the project."}</p>}
++        {certificate ? <Link className="w-fit font-semibold text-navy underline" href={`/certificate/${certificate.id}`}>Certificate {certificate.id}</Link> : <p className="text-muted">{projectDone ? "Certificate pending." : "Certificate unlocks after the project."}</p>}
+       </section> : null}
+     </main>
+   );
+--- a/apps/web/src/app/courses/[courseId]/project/page.tsx
++++ b/apps/web/src/app/courses/[courseId]/project/page.tsx
+@@ -5,6 +5,7 @@
+ import { getSession } from "@/lib/auth";
+ import { getCatalog } from "@/lib/catalog";
+ import { getLearner } from "@/lib/progress-store";
++import { courseCertificate } from "@/lib/course-certificate";
+ 
+ export default async function ProjectPage({ params }: { params: Promise<{ courseId: string }> }) {
+   const { courseId } = await params;
+@@ -14,14 +15,16 @@
+   const learner = await getLearner(session.learnerId);
+   if (!catalog.project || !isCourseComplete(catalog, learner) || !learner.assessmentCourseIds.includes(courseId)) redirect(`/courses/${courseId}`);
+   const passed = learner.passedExerciseIds.includes(catalog.project.id);
++  const certificate = courseCertificate(learner, courseId);
+   return (
+     <main className="h-screen">
+       <Workspace
+         exercise={catalog.project}
+         initialCode={learner.drafts[catalog.project.id] ?? catalog.project.starterCode}
+-        passed={passed}
++        // Historical progress stays intact; missing credentials require a graded resubmission.
++        passed={passed && certificate !== null}
+         previousHref={`/courses/${courseId}`}
+-        nextHref={learner.certificate ? `/certificate/${learner.certificate.id}` : `/courses/${courseId}`}
++        nextHref={certificate ? `/certificate/${certificate.id}` : `/courses/${courseId}`}
+       />
+       <p className="sr-only"><Link href={`/courses/${courseId}`}>Back</Link></p>
+     </main>
+--- a/packages/shared/src/index.ts
++++ b/packages/shared/src/index.ts
+@@ -13,3 +13,23 @@
+   "blank-prompt guard",
+   "API error handling",
+ ];
++
++// These describe simulated practice, not real SDK execution or production certification.
++const coursePracticeTopics: Record<string, string[]> = {
++  "openai-api-fundamentals": ["API request configuration", "Output extraction and blank/error guards"],
++  "agent-foundations": ["Chaining and routing concepts", "Agent loop concepts"],
++  "rag-fundamentals": ["Retrieval and source selection", "Abstention concepts"],
++  "openai-agents-sdk": ["Agent and Runner declarations", "Tool and handoff declarations"],
++  "crewai-fundamentals": ["Role and task declarations", "Process and context configuration"],
++  "langgraph-fundamentals": ["Node, edge, and routing configuration", "Checkpointer configuration"],
++  "google-adk-fundamentals": ["Agent, tool, and sequence configuration"],
++  "mcp-fundamentals": ["Server, tool, and resource declarations"],
++};
++
++export function certificateMetadata(courseId: string, courseTitle: string): { title: string; skills: string[] } {
++  const topics = Object.hasOwn(coursePracticeTopics, courseId) ? coursePracticeTopics[courseId] : [];
++  return {
++    title: `${courseTitle} — Course Completion`,
++    skills: topics.map((topic) => `Simulated practice: ${topic}`),
++  };
++}
+--- a/apps/web/src/components/course/CourseOverview.test.tsx
++++ b/apps/web/src/components/course/CourseOverview.test.tsx
+@@ -16,6 +16,15 @@
+ } as unknown as PublishedCatalog;
+ 
+ describe("CourseOverview", () => {
++  it("shows only the current course credential, never another course legacy slot", () => {
++    const certificate = { id: "OWN", courseId: "sample-course", holderName: "Synthetic", title: "Completion", issuedAt: "2020", skills: [] };
++    const learner = { enrolledCourseIds: [], completedStepIds: [], passedExerciseIds: [], assessmentCourseIds: [], certificate: { ...certificate, id: "OTHER", courseId: "other-course" }, certificatesByCourseId: { "sample-course": certificate } };
++    const own = renderToStaticMarkup(<CourseOverview catalog={catalog} learner={learner as never} />);
++    expect(own).toContain('href="/certificate/OWN"');
++    expect(own).not.toContain('/certificate/OTHER');
++    const other = renderToStaticMarkup(<CourseOverview catalog={catalog} learner={{ ...learner, certificatesByCourseId: {} } as never} />);
++    expect(other).not.toContain('/certificate/OTHER');
++  });
+   it("shows public course information and modules without learner-only data", () => {
+     const html = renderToStaticMarkup(<CourseOverview catalog={catalog} />);
+     expect(html).toContain("Sample Course");
+--- /dev/null
++++ b/apps/web/src/lib/course-certificate.ts
+@@ -0,0 +1,10 @@
++import type { CertificateRecord } from "./progress-store";
++
++export function courseCertificate(
++  learner: { certificate?: CertificateRecord | null; certificatesByCourseId?: Record<string, CertificateRecord> } | undefined,
++  courseId: string,
++): CertificateRecord | null {
++  const certificate = learner?.certificatesByCourseId?.[courseId];
++  if (certificate?.courseId === courseId) return certificate;
++  return learner?.certificate?.courseId === courseId ? learner.certificate : null;
++}
+--- /dev/null
++++ b/apps/web/src/lib/course-certificates.test.ts
+@@ -0,0 +1,135 @@
++import { beforeEach, describe, expect, it, vi } from "vitest";
++import type { PublishedCatalog } from "@academy/course-engine";
++import { certificateMetadata } from "@academy/shared";
++import { getLearner, saveCertificate, findCertificate, type CertificateRecord } from "./progress-store";
++import { POST } from "@/app/api/execute/route";
++
++// No disk, accounts, or executor access: the real storage and route code use synthetic IO.
++const io = vi.hoisted(() => ({ text: "", session: true, status: "passed" }));
++vi.mock("node:fs/promises", () => ({
++  readFile: async () => io.text,
++  mkdir: async () => undefined,
++  writeFile: async (_path: string, text: string) => { io.text = text; },
++}));
++vi.mock("@/lib/auth", () => ({ getSession: async () => io.session ? { learnerId: "synthetic", name: "Synthetic Learner" } : null }));
++vi.mock("@/lib/executor", () => ({ callExecutor: async () => ({ status: io.status, stdout: "", stderr: "", truncated: false, feedback: [] }) }));
++vi.mock("@/lib/catalog", () => ({
++  findCatalogByExercise: async (id: string) => catalogs.find((catalog) => catalog.project?.id === id || catalog.exercises.some((exercise) => exercise.id === id)),
++  findExercise: (catalog: PublishedCatalog, id: string) => catalog.project?.id === id ? catalog.project : catalog.exercises.find((exercise) => exercise.id === id),
++}));
++
++const catalogs: PublishedCatalog[] = ["openai-api-fundamentals", "agent-foundations"].map((id) => ({
++  course: { id, title: id, summary: "Synthetic", level: "Basic", durationMinutes: 1, moduleIds: [`${id}-module`] },
++  modules: [{ id: `${id}-module`, title: "Synthetic", durationMinutes: 1, lessonIds: [`${id}-lesson`] }],
++  lessons: [{ id: `${id}-lesson`, title: "Synthetic", summary: "Synthetic", durationMinutes: 1, steps: [{ id: `${id}-intro`, type: "explanation", title: "Synthetic", body: [], takeaway: "", example: "" }] }],
++  exercises: [{ id: `${id}-exercise`, title: "Practice", order: 1, instructions: [], starterCode: "", hints: [], runtime: "python" }],
++  project: { id: `${id}-project`, title: "Project", order: 2, instructions: [], starterCode: "", hints: [], runtime: "python" },
++}));
++const a: CertificateRecord = { id: "HISTORICAL-A", courseId: "openai-api-fundamentals", holderName: "Original Holder", title: "Original Title", issuedAt: "2020-01-01", skills: ["Original Skill"] };
++const b: CertificateRecord = { ...a, id: "B", courseId: "agent-foundations" };
++function seed(certificate: CertificateRecord | null = null) {
++  return { enrolledCourseIds: catalogs.map((c) => c.course.id), completedStepIds: catalogs.map((c) => `${c.course.id}-intro`), passedExerciseIds: ["existing-pass"], drafts: { existing: "untouched" }, attempts: [{ id: "old", exerciseId: "existing", status: "passed", at: "2020" }], assessmentPassed: true, assessmentCourseIds: catalogs.map((c) => c.course.id), certificate };
++}
++async function execute(id: string, mode = "submit") {
++  return POST(new Request("http://synthetic.test/api/execute", { method: "POST", body: JSON.stringify({ exerciseId: id, mode, source: "synthetic" }) }));
++}
++beforeEach(() => { io.text = JSON.stringify({ learners: { synthetic: seed() } }); io.session = true; io.status = "passed"; });
++
++describe("per-course certificate storage", () => {
++  it("normalizes legacy credentials without changing history or progress", async () => {
++    const original = seed(a);
++    io.text = JSON.stringify({ learners: { synthetic: original } });
++    const learner = await getLearner("synthetic");
++    expect(learner).toMatchObject(original);
++    expect(learner.certificatesByCourseId).toEqual({ "openai-api-fundamentals": a });
++  });
++  it("saves B preserving A and every progress field, then finds both publicly", async () => {
++    const original = seed(a);
++    io.text = JSON.stringify({ learners: { synthetic: original } });
++    const saved = await saveCertificate("synthetic", b);
++    expect(saved).toMatchObject(original);
++    expect(saved.certificatesByCourseId).toEqual({ "openai-api-fundamentals": a, "agent-foundations": b });
++    expect(await findCertificate("HISTORICAL-A")).toEqual(a);
++    expect(await findCertificate("B")).toEqual(b);
++  });
++  it("retains first issuance date and metadata on repeated saves", async () => {
++    await saveCertificate("synthetic", a);
++    const saved = await saveCertificate("synthetic", { ...a, id: "REPLACEMENT", issuedAt: "2099", title: "Changed", holderName: "Changed", skills: [] });
++    expect(saved.certificate).toEqual(a);
++    expect(saved.certificatesByCourseId[a.courseId]).toEqual(a);
++  });
++  it("finds legacy fallback even when a mixed record map has its own credential", async () => {
++    io.text = JSON.stringify({ learners: { synthetic: { ...seed(a), certificatesByCourseId: { [a.courseId]: { ...a, id: "MAP-A" }, [b.courseId]: b } } } });
++    expect(await findCertificate("HISTORICAL-A")).toEqual(a);
++    expect(await findCertificate("MAP-A")).toEqual({ ...a, id: "MAP-A" });
++    expect(await findCertificate("B")).toEqual(b);
++    expect(await findCertificate("missing")).toBeNull();
++  });
++});
++
++describe("new credential metadata", () => {
++  it.each([
++    ["openai-api-fundamentals", "API request configuration"], ["agent-foundations", "Chaining and routing concepts"],
++    ["rag-fundamentals", "Retrieval and source selection"], ["openai-agents-sdk", "Agent and Runner declarations"],
++    ["crewai-fundamentals", "Role and task declarations"], ["langgraph-fundamentals", "Node, edge, and routing configuration"],
++    ["google-adk-fundamentals", "Agent, tool, and sequence configuration"], ["mcp-fundamentals", "Server, tool, and resource declarations"],
++  ])("scopes %s to simulated practice", (id, topic) => {
++    const metadata = certificateMetadata(id, "Course Title");
++    expect(metadata.title).toBe("Course Title — Course Completion");
++    expect(metadata.skills.join(" ")).toContain(topic);
++    expect(metadata.skills.every((skill) => skill.startsWith("Simulated practice: "))).toBe(true);
++    expect(metadata.skills.join(" ")).not.toMatch(/mastery|production|real execution|persistence/i);
++  });
++  it("does not invent skills for unknown courses", () => {
++    expect(certificateMetadata("unknown", "Unknown")).toEqual({ title: "Unknown — Course Completion", skills: [] });
++  });
++  it.each(["constructor", "__proto__", "toString"])("treats inherited key %s as an unknown course", (id) => {
++    expect(certificateMetadata(id, "Unknown")).toEqual({ title: "Unknown — Course Completion", skills: [] });
++  });
++});
++
++describe("project issuance route", () => {
++  it("revalidates historically passed B without replacing legacy A or granting through Run", async () => {
++    const original = { ...seed(a), passedExerciseIds: ["existing-pass", "agent-foundations-project"] };
++    io.text = JSON.stringify({ learners: { synthetic: original } });
++    await execute("agent-foundations-project", "run");
++    const beforeSubmit = await getLearner("synthetic");
++    expect(beforeSubmit.certificatesByCourseId).toEqual({ "openai-api-fundamentals": a });
++    expect(beforeSubmit.passedExerciseIds).toEqual(original.passedExerciseIds);
++    const submitted = await (await execute("agent-foundations-project")).json();
++    const saved = await getLearner("synthetic");
++    expect(submitted.certificateHref).toBe(`/certificate/${saved.certificatesByCourseId["agent-foundations"].id}`);
++    expect(saved.certificate).toEqual(a);
++    expect(saved.passedExerciseIds).toEqual(original.passedExerciseIds);
++  });
++  it("submits A then B and returns each actually persisted credential", async () => {
++    const first = await (await execute("openai-api-fundamentals-project")).json();
++    const second = await (await execute("agent-foundations-project")).json();
++    expect(first.certificateHref).toMatch(/^\/certificate\/AI-/);
++    expect(second.certificateHref).toMatch(/^\/certificate\/AI-/);
++    expect(second.certificateHref).not.toBe(first.certificateHref);
++    const learner = await getLearner("synthetic");
++    expect(Object.keys(learner.certificatesByCourseId)).toHaveLength(2);
++    expect(await findCertificate(second.certificateHref.split("/").pop())).toEqual(learner.certificatesByCourseId["agent-foundations"]);
++    expect(learner.certificate).toEqual(learner.certificatesByCourseId["openai-api-fundamentals"]);
++    const repeated = await (await execute("agent-foundations-project")).json();
++    expect(repeated.certificateHref).toBe(second.certificateHref);
++  });
++  it.each(["run", "failed", "locked", "unauthenticated", "exercise"])("does not issue for %s", async (reason) => {
++    if (reason === "failed") io.status = "failed";
++    if (reason === "locked") io.text = JSON.stringify({ learners: { synthetic: { ...seed(), assessmentCourseIds: [] } } });
++    if (reason === "unauthenticated") io.session = false;
++    const response = await execute(reason === "exercise" ? "openai-api-fundamentals-exercise" : "openai-api-fundamentals-project", reason === "run" ? "run" : "submit");
++    const body = await response.json();
++    expect(body.certificateHref ?? null).toBeNull();
++    expect((await getLearner("synthetic")).certificate).toBeNull();
++    if (reason === "locked") expect(response.status).toBe(403);
++    if (reason === "unauthenticated") expect(response.status).toBe(401);
++    if (reason === "run") expect((await getLearner("synthetic")).passedExerciseIds).toEqual(["existing-pass"]);
++  });
++  it("does not issue when lesson prerequisites are incomplete", async () => {
++    io.text = JSON.stringify({ learners: { synthetic: { ...seed(), completedStepIds: [] } } });
++    expect((await execute("openai-api-fundamentals-project")).status).toBe(403);
++    expect((await getLearner("synthetic")).certificate).toBeNull();
++  });
++});
+--- /dev/null
++++ b/apps/web/src/components/workspace/workspace-navigation.ts
+@@ -0,0 +1,7 @@
++type NavigationState = { done: boolean; nextHref: string | null };
++type SubmissionResponse = { result: { status: string }; certificateHref?: string | null };
++
++export function submissionNavigation(state: NavigationState, mode: "run" | "submit", body: SubmissionResponse): NavigationState {
++  if (mode !== "submit" || body.result.status !== "passed") return state;
++  return { done: true, nextHref: body.certificateHref ?? state.nextHref };
++}
+--- /dev/null
++++ b/apps/web/src/components/workspace/workspace-navigation.test.ts
+@@ -0,0 +1,16 @@
++import { describe, expect, it } from "vitest";
++import { submissionNavigation } from "./workspace-navigation";
++
++describe("explicit Continue destination", () => {
++  const state = { done: false, nextHref: "/courses/course" };
++  it("uses the issued credential only after successful submission", () => {
++    expect(submissionNavigation(state, "submit", { result: { status: "passed" }, certificateHref: "/certificate/OWN" })).toEqual({ done: true, nextHref: "/certificate/OWN" });
++  });
++  it("keeps ordinary lesson fallback when no credential is returned", () => {
++    expect(submissionNavigation(state, "submit", { result: { status: "passed" } })).toEqual({ ...state, done: true });
++  });
++  it("does not complete or redirect on Run or failed Submit", () => {
++    expect(submissionNavigation(state, "run", { result: { status: "passed" }, certificateHref: "/certificate/OTHER" })).toEqual(state);
++    expect(submissionNavigation(state, "submit", { result: { status: "failed" }, certificateHref: "/certificate/OTHER" })).toEqual(state);
++  });
++});
+--- /dev/null
++++ b/apps/web/src/app/courses/[courseId]/project/ProjectPage.test.tsx
+@@ -0,0 +1,57 @@
++import React from "react";
++import { renderToStaticMarkup } from "react-dom/server";
++import { describe, expect, it, vi } from "vitest";
++import ProjectPage from "./page";
++import { Workspace } from "@/components/workspace/Workspace";
++
++vi.stubGlobal("React", React);
++const fixture = vi.hoisted(() => ({ certificatesByCourseId: {} as Record<string, unknown>, legacyCourseId: "other-course" }));
++vi.mock("@/lib/auth", () => ({ getSession: async () => ({ learnerId: "synthetic", name: "Synthetic" }) }));
++vi.mock("@/lib/catalog", () => ({ getCatalog: async () => ({
++  course: { id: "sample-course", title: "Synthetic", moduleIds: ["module"] },
++  modules: [{ id: "module", lessonIds: ["lesson"] }],
++  lessons: [{ id: "lesson", steps: [{ id: "intro", type: "explanation" }] }],
++  exercises: [],
++  project: { id: "project", title: "Synthetic", order: 2, instructions: [], starterCode: "", hints: [], runtime: "python" },
++}) }));
++vi.mock("@/lib/progress-store", () => ({ getLearner: async () => ({
++  enrolledCourseIds: ["sample-course"], completedStepIds: ["intro"], passedExerciseIds: ["project"],
++  assessmentCourseIds: ["sample-course"], drafts: {},
++  certificate: { id: "LEGACY", courseId: fixture.legacyCourseId },
++  certificatesByCourseId: fixture.certificatesByCourseId,
++}) }));
++// Keep the actual Workspace controls; only the external Monaco loader is replaced.
++vi.mock("next/dynamic", () => ({ default: () => () => null }));
++
++describe("project page credential destination", () => {
++  it("renders only its own mapped credential", async () => {
++    fixture.legacyCourseId = "other-course";
++    fixture.certificatesByCourseId = { "sample-course": { id: "OWN", courseId: "sample-course" } };
++    const html = renderToStaticMarkup(await ProjectPage({ params: Promise.resolve({ courseId: "sample-course" }) }));
++    expect(html).toContain('href="/certificate/OWN"');
++    expect(html).toContain('>Continue</a>');
++    expect(html).not.toContain('>Submit answer</button>');
++    expect(html).not.toContain('/certificate/LEGACY');
++  });
++  it("falls back to the course overview rather than another course credential", async () => {
++    fixture.legacyCourseId = "other-course";
++    fixture.certificatesByCourseId = {};
++    const html = renderToStaticMarkup(await ProjectPage({ params: Promise.resolve({ courseId: "sample-course" }) }));
++    expect(html).toContain('href="/courses/sample-course"');
++    expect(html).not.toContain('/certificate/LEGACY');
++    expect(html).toContain('>Submit answer</button>');
++    expect(html).not.toContain('>Continue</a>');
++  });
++  it("retains an own-course legacy destination", async () => {
++    fixture.legacyCourseId = "sample-course";
++    fixture.certificatesByCourseId = {};
++    const html = renderToStaticMarkup(await ProjectPage({ params: Promise.resolve({ courseId: "sample-course" }) }));
++    expect(html).toContain('href="/certificate/LEGACY"');
++  });
++  it("retains Continue for an ordinary historically passed exercise", () => {
++    const html = renderToStaticMarkup(<Workspace exercise={{ id: "ordinary", title: "Practice", order: 1, instructions: [], starterCode: "", hints: [], runtime: "python" }} initialCode="" passed={true} previousHref={null} nextHref="/learn/sample-course/next" />);
++    expect(html).toContain('href="/learn/sample-course/next"');
++    expect(html).toContain('>Continue</a>');
++    expect(html).not.toContain('>Submit answer</button>');
++  });
++});

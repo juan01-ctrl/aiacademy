@@ -1,0 +1,15 @@
+id: crew-assign-task
+title: Assign the research task
+order: 1
+instructions:
+  - Create an Agent with role researcher.
+  - Create a Task whose description is Collect notes and whose agent is that researcher.
+  - Return the task.
+starterCode: |
+  from crewai import Agent, Task
+
+  def build_task():
+      return None
+hints:
+  - Agent first. Task second. The role string is researcher.
+runtime: python

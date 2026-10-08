@@ -1,0 +1,15 @@
+id: agents-build
+title: Create the Assistant
+order: 1
+instructions:
+  - Create an Agent named Assistant.
+  - Set instructions to You are a helpful assistant.
+  - Return the agent.
+starterCode: |
+  from agents import Agent
+
+  def build_agent():
+      return None
+hints:
+  - name and instructions are constructor arguments.
+runtime: python

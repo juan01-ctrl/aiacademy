@@ -1,0 +1,15 @@
+id: rag-project
+title: Final project
+order: 1
+instructions:
+  - Split the document into chunks and add them to a new index.
+  - Search that index with the query.
+  - Return the source of the first hit.
+starterCode: |
+  from retrieval import Index
+
+  def answer_from_doc(document: str, query: str) -> str:
+      return ""
+hints:
+  - Index, add, search, then the source field.
+runtime: python

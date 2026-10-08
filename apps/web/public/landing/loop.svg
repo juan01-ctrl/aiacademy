@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" fill="none">
+  <rect width="320" height="200" rx="18" fill="#14283c"/>
+  <rect x="28" y="36" width="88" height="48" rx="10" fill="#0f5c73"/>
+  <rect x="204" y="36" width="88" height="48" rx="10" fill="#c9842a"/>
+  <rect x="116" y="116" width="88" height="48" rx="10" fill="#1f7a4d"/>
+  <path d="M116 60h88M248 84c20 28-20 52-44 52M116 140c-36 0-52-40-40-72" stroke="#d7e4ea" stroke-width="3"/>
+  <text x="72" y="66" text-anchor="middle" fill="#fff" font-size="13" font-family="ui-monospace">llm</text>
+  <text x="248" y="66" text-anchor="middle" fill="#14283c" font-size="13" font-family="ui-monospace">tool</text>
+  <text x="160" y="146" text-anchor="middle" fill="#fff" font-size="13" font-family="ui-monospace">done</text>
+</svg>

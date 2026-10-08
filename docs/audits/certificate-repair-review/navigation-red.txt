@@ -1,0 +1,63 @@
+
+ RUN  v3.2.7 /Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web
+
+ ❯ src/components/workspace/workspace-navigation.test.ts (3 tests | 2 failed) 4ms
+   × explicit Continue destination > uses the issued credential only after successful submission 3ms
+     → expected { done: false, …(1) } to deeply equal { done: true, …(1) }
+   × explicit Continue destination > keeps ordinary lesson fallback when no credential is returned 0ms
+     → expected { done: false, …(1) } to deeply equal { done: true, …(1) }
+   ✓ explicit Continue destination > does not complete or redirect on Run or failed Submit 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/workspace/workspace-navigation.test.ts > explicit Continue destination > uses the issued credential only after successful submission
+AssertionError: expected { done: false, …(1) } to deeply equal { done: true, …(1) }
+
+- Expected
++ Received
+
+  {
+-   "done": true,
+-   "nextHref": "/certificate/OWN",
++   "done": false,
++   "nextHref": "/courses/course",
+  }
+
+ ❯ src/components/workspace/workspace-navigation.test.ts:7:122
+      5|   const state = { done: false, nextHref: "/courses/course" };
+      6|   it("uses the issued credential only after successful submission", ()…
+      7|     expect(submissionNavigation(state, "submit", { result: { status: "…
+       |                                                                                                                          ^
+      8|   });
+      9|   it("keeps ordinary lesson fallback when no credential is returned", …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/components/workspace/workspace-navigation.test.ts > explicit Continue destination > keeps ordinary lesson fallback when no credential is returned
+AssertionError: expected { done: false, …(1) } to deeply equal { done: true, …(1) }
+
+- Expected
++ Received
+
+  {
+-   "done": true,
++   "done": false,
+    "nextHref": "/courses/course",
+  }
+
+ ❯ src/components/workspace/workspace-navigation.test.ts:10:85
+      8|   });
+      9|   it("keeps ordinary lesson fallback when no credential is returned", …
+     10|     expect(submissionNavigation(state, "submit", { result: { status: "…
+       |                                                                                     ^
+     11|   });
+     12|   it("does not complete or redirect on Run or failed Submit", () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed (3)
+   Start at  15:48:27
+   Duration  331ms (transform 19ms, setup 0ms, collect 14ms, tests 4ms, environment 0ms, prepare 56ms)
+

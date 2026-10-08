@@ -1,0 +1,27 @@
+id: planner-and-writer
+title: Planner and writer
+summary: A deep-research shape is a manager that hands the turn to a planner and a writer.
+durationMinutes: 14
+steps:
+  - id: sdk-three
+    type: explanation
+    title: Three agents
+    body:
+      - "A research job splits into planning the searches and writing the report. Those are two agents, not two sentences in one instruction."
+      - "Planner breaks the question into searches. Writer turns the notes into the report. Manager decides who takes the turn."
+    takeaway: Create Planner, Writer, and Manager.
+    example: |
+      planner = Agent(name="Planner", instructions="Break the question into searches.")
+      writer = Agent(name="Writer", instructions="Write the report.")
+  - id: sdk-manager-handoffs
+    type: explanation
+    title: The manager delegates
+    body:
+      - "handoffs on the manager is the list of specialists. Both Planner and Writer belong there."
+      - "A manager with an empty handoffs list cannot delegate. It is one agent again."
+    takeaway: Pass both specialists in handoffs.
+    example: |
+      Agent(name="Manager", instructions="Delegate research.", handoffs=[planner, writer])
+  - id: sdk-practice-research
+    type: exercise
+    exerciseId: agents-research

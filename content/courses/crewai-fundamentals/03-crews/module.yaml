@@ -1,0 +1,5 @@
+id: crews
+title: Kick off the crew
+durationMinutes: 14
+lessonIds:
+  - kickoff

@@ -1,0 +1,34 @@
+
+ RUN  v3.2.7 /Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web
+
+ ❯ src/app/courses/[courseId]/project/ProjectPage.test.tsx (4 tests | 1 failed) 9ms
+   ✓ project page credential destination > renders only its own mapped credential 4ms
+   × project page credential destination > falls back to the course overview rather than another course credential 4ms
+     → expected '<main class="h-screen"><section class…' to contain '>Submit answer</button>'
+   ✓ project page credential destination > retains an own-course legacy destination 0ms
+   ✓ project page credential destination > retains Continue for an ordinary historically passed exercise 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/app/courses/[courseId]/project/ProjectPage.test.tsx > project page credential destination > falls back to the course overview rather than another course credential
+AssertionError: expected '<main class="h-screen"><section class…' to contain '>Submit answer</button>'
+
+Expected: ">Submit answer</button>"
+Received: "<main class="h-screen"><section class="grid h-full lg:grid-cols-2"><div class="overflow-auto bg-white px-8 py-8"><p class="text-xs font-semibold tracking-wide text-muted uppercase">Exercise · 100 XP</p><h1 class="mt-2 text-2xl font-semibold">Synthetic</h1><ol class="mt-4 grid list-decimal gap-2 pl-5 text-[15px] leading-7"></ol><button type="button" class="btn btn-ghost mt-5 px-0 underline">Take hint</button><p role="status" class="mt-6 rounded-md bg-pass/15 px-4 py-3 text-sm font-medium">Great work. Your code stays. Continue when you are ready.</p></div><div class="grid min-h-0 grid-rows-[auto_1fr_auto_auto] bg-editor text-white"><p class="border-b border-white/10 px-4 py-2 font-mono text-xs">script.py</p><pre class="max-h-36 overflow-auto border-t border-white/10 px-4 py-3 font-mono text-xs" aria-live="polite"><span class="mb-1 block text-white/50">Console</span>Run code to see output.</pre><div class="flex flex-wrap items-center gap-2 border-t border-white/10 bg-white px-4 py-3 text-navy"><a href="/courses/sample-course" class="btn btn-ghost">Previous</a><button type="button" class="btn btn-ghost">Reset</button><button type="button" class="btn btn-secondary ml-auto">Run code</button><a href="/courses/sample-course" class="btn btn-primary">Continue</a></div></div></section><p class="sr-only"><a href="/courses/sample-course">Back</a></p></main>"
+
+ ❯ src/app/courses/[courseId]/project/ProjectPage.test.tsx:42:18
+     40|     expect(html).toContain('href="/courses/sample-course"');
+     41|     expect(html).not.toContain('/certificate/LEGACY');
+     42|     expect(html).toContain('>Submit answer</button>');
+       |                  ^
+     43|     expect(html).not.toContain('>Continue</a>');
+     44|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 passed (4)
+   Start at  15:56:31
+   Duration  558ms (transform 54ms, setup 0ms, collect 160ms, tests 9ms, environment 0ms, prepare 64ms)
+

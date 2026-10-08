@@ -1,0 +1,47 @@
+id: what-is-rag
+title: What is RAG
+summary: RAG gives the model your documents at question time, then answers from a retrieved passage.
+durationMinutes: 16
+steps:
+  - id: rag-what-is-it
+    type: explanation
+    title: What is RAG
+    body:
+      - "RAG means retrieval-augmented generation. You give the model access to a set of data at question time, then it writes the answer from what you retrieved."
+      - "That data can be private, recent, or simply absent from the model's training. A model alone answers from training. The answer can sound right and still be wrong."
+      - "You also cannot paste a whole handbook into the prompt. You select the passages that match the question, then generate."
+      - "The two halves are the name. Retrieve the passage. Generate the answer from that passage."
+    takeaway: RAG fetches a passage, then generates from it.
+    example: |
+      hits = index.search(query)
+      answer = ask_llm(hits[0]["text"])
+  - id: rag-what-for
+    type: explanation
+    title: What is it used for
+    body:
+      - "Use it for question answering over documents you control. A handbook, a ticket history, a set of notes."
+      - "The LangChain RAG tutorial indexes documentation, searches the chunks, and answers with the source. The answer is grounded in that source, not in memory."
+      - "Do not use it when there is no document. That is just a model call."
+    takeaway: Use RAG when the facts are in your files, not in the model.
+    example: |
+      return hits[0]["source"]
+  - id: rag-what-you-will-learn
+    type: explanation
+    title: What you will practice here
+    body:
+      - "Indexing has four steps. Load the file, split it into chunks, embed each chunk as numbers, store those chunks."
+      - "Then you search, and the answer prompt must include the retrieved text. If search returns nothing, there is no source to cite."
+      - "The teaching index stands in for the vector store. You still split before you store."
+    takeaway: Load, split, embed, store, retrieve, generate.
+    example: |
+      chunks = [part.strip() for part in document.split("\n\n") if part.strip()]
+  - id: rag-before-the-editor
+    type: explanation
+    title: Before the editor
+    body:
+      - "A chunk is the unit you search. A whole file hides the sentence that would have matched."
+      - "The next lesson splits a document on blank lines and adds the chunks."
+    takeaway: Next you will split on blank lines and call Index.add.
+    example: |
+      index = Index()
+      index.add(chunks)

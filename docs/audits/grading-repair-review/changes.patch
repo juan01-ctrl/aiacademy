@@ -1,0 +1,452 @@
+--- before/apps/executor/src/grade-boundary.test.ts
++++ after/apps/executor/src/grade-boundary.test.ts
+@@ -0,0 +1,29 @@
++import { beforeEach, describe, expect, it, vi } from "vitest";
++import { runIsolated } from "./isolate";
++import { executeExercise } from "./grade";
++
++vi.mock("./isolate", () => ({ runIsolated: vi.fn() }));
++const run = vi.mocked(runIsolated);
++const submit = () => executeExercise({ exerciseId: "adk-project", source: "", mode: "submit" });
++const evidence = [{ name: "Agent", arguments: { name: "researcher", model: "gemini-flash-latest", tools: 1 } }];
++
++beforeEach(() => run.mockReset());
++describe("submit harness success boundary", () => {
++  it.each([null, {}, { ok: false }, { ok: "true" }, { ok: 1 }, [], "true", { ok: true, results: [{ ok: false }] }, { ok: true, results: [] }, { ok: true, results: "malformed" }])("rejects malformed or failed success %j", async (result) => {
++    run.mockResolvedValue({ status: "ok", stdout: "output", stderr: "", truncated: false, trace: evidence, result } as never);
++    const response = await submit();
++    expect(response.status).toBe("failed");
++    expect(response.feedback[0]?.concept).toBe("Function execution");
++  });
++  it("grades a successful harness result", async () => {
++    run.mockResolvedValue({ status: "ok", stdout: "", stderr: "", truncated: false, trace: evidence, result: { ok: true } });
++    expect((await submit()).status).toBe("passed");
++  });
++  it("keeps Run ungraded even without a harness payload", async () => {
++    run.mockResolvedValue({ status: "ok", stdout: "output", stderr: "", truncated: false, trace: [], result: null });
++    const response = await executeExercise({ exerciseId: "adk-project", source: "", mode: "run" });
++    expect(response.status).toBe("ok");
++    expect(response.stdout).toBe("output");
++    expect(response.feedback).toEqual([]);
++  });
++});
+--- before/apps/executor/src/grade.ts
++++ after/apps/executor/src/grade.ts
+@@ -97,6 +97,25 @@
+     });
+   }
+ 
++  // Process exit success alone does not prove that the entry function succeeded.
++  const result: unknown = isolated.result;
++  const payload = result && typeof result === "object" && !Array.isArray(result)
++    ? result as Record<string, unknown> : null;
++  const calls = payload?.results;
++  if (payload?.ok !== true || (calls !== undefined && (
++    !Array.isArray(calls) || calls.length === 0 || calls.some((call) =>
++      !call || typeof call !== "object" || Array.isArray(call) || call.ok !== true
++    )
++  ))) {
++    return executionResultSchema.parse({
++      status: "failed",
++      stdout: isolated.stdout,
++      stderr: isolated.stderr,
++      truncated: isolated.truncated,
++      feedback: [{ concept: "Function execution", message: "The submitted function did not complete successfully. Define the required function and fix execution errors before submitting." }],
++    });
++  }
++
+   const graded = await gradeTrace(input.exerciseId, isolated.trace, isolated.result);
+   return executionResultSchema.parse({
+     status: graded.passed ? "passed" : "failed",
+--- before/apps/executor/grading/grader.py
++++ after/apps/executor/grading/grader.py
+@@ -12,4 +12,15 @@
+     raise RuntimeError("Hidden test could not be loaded")
+ module = importlib.util.module_from_spec(spec)
+ spec.loader.exec_module(module)
+-print(json.dumps(module.grade(trace, result)))
++# Same fail-closed boundary for direct/offline grader use.
++calls = result.get("results") if isinstance(result, dict) else None
++success = isinstance(result, dict) and result.get("ok") is True
++if isinstance(result, dict) and "results" in result:
++    success = success and isinstance(calls, list) and bool(calls) and all(
++        isinstance(call, dict) and call.get("ok") is True for call in calls
++    )
++if not success:
++    graded = {"passed": False, "feedback": [{"concept": "Function execution", "message": "The submitted function did not complete successfully."}]}
++else:
++    graded = module.grade(trace, result)
++print(json.dumps(graded))
+--- before/apps/executor/grading/harness.py
++++ after/apps/executor/grading/harness.py
+@@ -30,7 +30,12 @@
+         for call in calls:
+             try:
+                 value = fn(*call.get("args", []))
+-                results.append({"ok": True, "value": value if isinstance(value, str) else None, "valueType": type(value).__name__})
++                item = {"ok": True, "value": value if isinstance(value, str) else None, "valueType": type(value).__name__}
++                # Declaration evidence only; the learner process is not a trusted boundary.
++                value_name = getattr(value, "name", None)
++                if isinstance(value_name, str):
++                    item["valueName"] = value_name
++                results.append(item)
+             except Exception as exc:
+                 results.append({"ok": False, "error": f"{type(exc).__name__}: {exc}", "trace": traceback.format_exc()[-800:]})
+     first = results[0] if results else {"ok": False}
+@@ -38,6 +43,7 @@
+         "ok": all(item.get("ok") for item in results),
+         "value": first.get("value"),
+         "valueType": first.get("valueType"),
++        "valueName": first.get("valueName"),
+         "error": first.get("error"),
+         "results": results,
+     }
+--- before/apps/executor/grading/manifest.json
++++ after/apps/executor/grading/manifest.json
+@@ -47,7 +47,8 @@
+     "calls": [
+       { "args": ["ping"] },
+       { "args": ["   "] },
+-      { "args": ["__academy_fail__"] }
++      { "args": ["__academy_fail__"] },
++      { "args": ["__academy_contrast__"] }
+     ]
+   },
+   "pass-few-shot": {
+--- before/apps/executor/grading/mocks/agents/__init__.py
++++ after/apps/executor/grading/mocks/agents/__init__.py
+@@ -33,6 +33,8 @@
+             "instructions": instructions,
+             "tools": len(tools or []),
+             "handoffs": len(handoffs or []),
++            "handoff_names": json.dumps([getattr(agent, "name", None) for agent in (handoffs or [])]),
++            "valid_handoffs": all(isinstance(agent, Agent) for agent in (handoffs or [])),
+         })
+         self.name = name
+         self.instructions = instructions
+--- before/apps/executor/grading/mocks/google/adk/__init__.py
++++ after/apps/executor/grading/mocks/google/adk/__init__.py
+@@ -29,6 +29,10 @@
+ 
+ class SequentialAgent:
+     def __init__(self, name, sub_agents):
+-        _record("SequentialAgent", {"name": name, "agents": len(sub_agents or [])})
++        _record("SequentialAgent", {
++            "name": name, "agents": len(sub_agents or []),
++            "agent_names": json.dumps([getattr(agent, "name", None) for agent in (sub_agents or [])]),
++            "valid_agents": all(isinstance(agent, Agent) for agent in (sub_agents or [])),
++        })
+         self.name = name
+         self.sub_agents = sub_agents
+--- before/apps/executor/grading/mocks/langgraph/graph.py
++++ after/apps/executor/grading/mocks/langgraph/graph.py
+@@ -20,6 +20,8 @@
+     def __init__(self, state):
+         _record("StateGraph", {"state": getattr(state, "__name__", "state")})
+         self.nodes = {}
++        self.edges = []
++        self.entry = None
+ 
+     def add_node(self, name, fn):
+         _record("add_node", {"name": name})
+@@ -28,6 +30,7 @@
+ 
+     def add_edge(self, source, target):
+         _record("add_edge", {"source": source, "target": target})
++        self.edges.append([source, target])
+         return self
+ 
+     def add_conditional_edges(self, source, router, path_map):
+@@ -36,8 +39,15 @@
+ 
+     def set_entry_point(self, name):
+         _record("set_entry_point", {"name": name})
++        self.entry = name
+         return self
+ 
+     def compile(self, checkpointer=None):
+-        _record("compile", {"nodes": len(self.nodes), "checkpointer": bool(checkpointer)})
++        # Construction snapshot only: this mock does not execute or persist a graph.
++        _record("compile", {
++            "nodes": len(self.nodes), "checkpointer": bool(checkpointer),
++            "checkpointer_value": json.dumps(checkpointer) if isinstance(checkpointer, (str, int, float, bool, type(None))) else type(checkpointer).__name__,
++            "graph": json.dumps({"nodes": {name: callable(fn) for name, fn in self.nodes.items()},
++                                 "edges": self.edges, "entry": self.entry}, sort_keys=True),
++        })
+         return self
+--- before/apps/executor/grading/mocks/openai/__init__.py
++++ after/apps/executor/grading/mocks/openai/__init__.py
+@@ -10,10 +10,10 @@
+ 
+ class Responses:
+     def create(self, **kwargs):
+-        _record("responses.create", kwargs)
++        _record("responses.create", dict(kwargs, outcome="error" if kwargs.get("input") == "__academy_fail__" else "success"))
+         if kwargs.get("input") == "__academy_fail__":
+             raise RuntimeError("upstream failed")
+-        return _Response("mocked-output")
++        return _Response("mocked-contrast-output" if kwargs.get("input") == "__academy_contrast__" else "mocked-output")
+ 
+ 
+ class OpenAI:
+@@ -35,6 +35,7 @@
+         safe_args["tool_name"] = tools[0].get("name", "")
+     text_format = arguments.get("text")
+     if isinstance(text_format, dict):
++        safe_args["text_format"] = json.dumps(text_format, sort_keys=True)
+         fmt = text_format.get("format", text_format)
+         if isinstance(fmt, dict) and isinstance(fmt.get("name"), str):
+             safe_args["schema_name"] = fmt["name"]
+--- before/apps/executor/grading/test_contracts.py
++++ after/apps/executor/grading/test_contracts.py
+@@ -0,0 +1,148 @@
++"""Offline benign harness/grader regressions; NOT isolation/security tests."""
++import json
++import os
++from pathlib import Path
++import subprocess
++import sys
++import tempfile
++import unittest
++
++ROOT = Path(__file__).resolve().parent
++MANIFEST = json.loads((ROOT / 'manifest.json').read_text())
++
++
++def assess(exercise, source):
++    with tempfile.TemporaryDirectory() as directory:
++        work = Path(directory)
++        (work / 'solution.py').write_text(source)
++        (work / 'trace.json').write_text('[]')
++        item = MANIFEST[exercise]
++        env = dict(os.environ, ACADEMY_MODE='submit', ACADEMY_WORKDIR=str(work),
++                   ACADEMY_MOCKS=str(ROOT / 'mocks'), ACADEMY_TRACE=str(work / 'trace.json'),
++                   ACADEMY_RESULT=str(work / 'result.json'), ACADEMY_ENTRY=item['entry'],
++                   ACADEMY_CALLS=json.dumps(item.get('calls', [{'args': item.get('args', [])}])),
++                   PYTHONDONTWRITEBYTECODE='1')
++        subprocess.run([sys.executable, '-B', str(ROOT / 'harness.py')], env=env, check=True, capture_output=True)
++        output = subprocess.run([sys.executable, '-B', str(ROOT / 'grader.py'), exercise,
++                                 str(work / 'trace.json'), str(work / 'result.json'),
++                                 str(ROOT / 'tests' / f'{exercise}.py')], env=env, check=True, capture_output=True, text=True)
++        return json.loads(output.stdout)['passed']
++
++
++GRAPH = '''from langgraph.graph import StateGraph
++class State(dict): pass
++def draft(state): return state
++def review(state): return state
++def build_graph():
++    graph = StateGraph(State)
++    graph.add_node("draft", draft)
++    graph.add_node("review", review)
++    graph.set_entry_point("draft")
++    graph.add_edge("draft", "review")
++    return graph.compile()
++'''
++ADK = '''from google.adk import Agent, SequentialAgent
++def build_pipeline():
++    researcher = Agent(name="researcher", model="gemini-flash-latest", instruction="Research.")
++    writer = Agent(name="writer", model="gemini-flash-latest", instruction="Write.")
++    return SequentialAgent(name="pipeline", sub_agents=[researcher, writer])
++'''
++SDK = '''from agents import Agent
++def build_research_team():
++    planner = Agent(name="Planner", instructions="Plan.")
++    writer = Agent(name="Writer", instructions="Write.")
++    return Agent(name="Manager", instructions="Delegate.", handoffs=[planner, writer])
++'''
++CAPSTONE = '''from openai import OpenAI
++def ask_llm(prompt):
++    if not prompt.strip(): return ""
++    try:
++        return OpenAI().responses.create(model="gpt-4.1-mini", input=prompt).output_text
++    except Exception:
++        return ""
++'''
++SCHEMA = '''from openai import OpenAI
++def ask_for_json(prompt, text_format):
++    return OpenAI().responses.create(model="gpt-4.1-mini", input=prompt, text=text_format).output_text
++'''
++CHECKPOINT = '''from langgraph.graph import StateGraph
++class State(dict): pass
++def draft(state): return state
++def build_graph(saver):
++    graph = StateGraph(State)
++    graph.add_node("draft", draft)
++    graph.set_entry_point("draft")
++    return graph.compile(checkpointer=saver)
++'''
++
++
++class GradingContracts(unittest.TestCase):
++    def test_capstone_rejects_fixed_output_without_api(self):
++        self.assertFalse(assess('responses-capstone', 'def ask_llm(prompt): return "mocked-output" if prompt == "ping" else ""'))
++
++    def test_capstone_requires_the_failed_call(self):
++        self.assertFalse(assess('responses-capstone', CAPSTONE.replace('if not prompt.strip():', 'if prompt == "__academy_fail__" or not prompt.strip():')))
++
++    def test_capstone_rejects_hardcoded_text_after_real_calls(self):
++        self.assertFalse(assess('responses-capstone', CAPSTONE.replace('return OpenAI().responses.create(model="gpt-4.1-mini", input=prompt).output_text', 'OpenAI().responses.create(model="gpt-4.1-mini", input=prompt)\n        return "mocked-output"')))
++
++    def test_capstone_accepts_taught_behavior(self):
++        self.assertTrue(assess('responses-capstone', CAPSTONE))
++
++    def test_graph_missing_entry_function_fails(self):
++        self.assertFalse(assess('lg-project', GRAPH.replace('def build_graph():', 'def unrelated():') + '\nunrelated()'))
++
++    def test_graph_rejects_invalid_construction(self):
++        for source in [GRAPH.replace('graph.add_node("review", review)', 'pass'),
++                       GRAPH.replace('graph.set_entry_point("draft")', 'pass'),
++                       GRAPH.replace('return graph.compile()', 'return graph'),
++                       GRAPH.replace('graph.add_edge("draft", "review")', 'graph.add_edge("missing", "review")'),
++                       GRAPH.replace('graph.add_node("draft", draft)', 'graph.add_node("draft", None)'),
++                       GRAPH.replace('graph = StateGraph(State)', 'graph = StateGraph(State)\n    other = StateGraph(State)').replace('return graph.compile()', 'return other.compile()')]:
++            with self.subTest(source=source):
++                self.assertFalse(assess('lg-project', source))
++
++    def test_graph_accepts_registered_compiled_project(self):
++        self.assertTrue(assess('lg-project', GRAPH))
++
++    def test_adk_rejects_wrong_order_or_non_agents(self):
++        for values in ['writer, researcher', 'researcher, researcher', 'object(), object()']:
++            with self.subTest(values=values):
++                self.assertFalse(assess('adk-sequence', ADK.replace('researcher, writer]', values + ']')))
++
++    def test_adk_accepts_declared_pipeline_order(self):
++        self.assertTrue(assess('adk-sequence', ADK))
++
++    def test_sdk_rejects_unrelated_or_duplicate_handoffs(self):
++        for values in ['planner, planner', 'object(), object()']:
++            with self.subTest(values=values):
++                self.assertFalse(assess('agents-research', SDK.replace('planner, writer]', values + ']')))
++
++    def test_sdk_rejects_returning_the_wrong_agent(self):
++        self.assertFalse(assess('agents-research', SDK.replace('return Agent(name="Manager"', 'manager = Agent(name="Manager"') + '    return planner\n'))
++
++    def test_sdk_accepts_specialist_declarations(self):
++        self.assertTrue(assess('agents-research', SDK))
++
++    def test_schema_rejects_name_without_supplied_format(self):
++        self.assertFalse(assess('pass-json-schema', SCHEMA.replace('text=text_format', 'text={"format": {"name": "answer"}}')))
++
++    def test_schema_accepts_supplied_format(self):
++        self.assertTrue(assess('pass-json-schema', SCHEMA))
++
++    def test_checkpointer_rejects_empty_or_unentered_graph(self):
++        for source in [CHECKPOINT.replace('graph.add_node("draft", draft)', 'pass'), CHECKPOINT.replace('graph.set_entry_point("draft")', 'pass')]:
++            with self.subTest(source=source):
++                self.assertFalse(assess('lg-checkpointer', source))
++
++    def test_checkpointer_accepts_taught_saver_passthrough(self):
++        self.assertTrue(assess('lg-checkpointer', CHECKPOINT))
++
++    def test_dispatcher_rejects_false_harness_success(self):
++        self.assertFalse(assess('adk-project', '''from google.adk import Agent
++Agent(name="researcher", model="gemini-flash-latest", instruction="Research.", tools=[object()])
++def build_researcher(): raise RuntimeError("broken")
++'''))
++
++
++if __name__ == '__main__': unittest.main()
+--- before/apps/executor/grading/tests/adk-sequence.py
++++ after/apps/executor/grading/tests/adk-sequence.py
+@@ -4,6 +4,8 @@
+     pipelines = [item for item in trace if item.get("name") == "SequentialAgent"]
+     if not pipelines or pipelines[-1].get("arguments", {}).get("name") != "pipeline":
+         return {"passed": False, "feedback": [{"concept": "Sequence", "message": "Create a SequentialAgent named pipeline."}]}
+-    if pipelines[-1].get("arguments", {}).get("agents") != 2:
++    args = pipelines[-1].get("arguments", {})
++    if (args.get("agent_names") != '["researcher", "writer"]' or args.get("valid_agents") is not True
++            or result.get("valueType") != "SequentialAgent"):
+         return {"passed": False, "feedback": [{"concept": "Sequence", "message": "Pass the researcher and the writer, in that order."}]}
+-    return {"passed": True, "feedback": [{"concept": "Sequence", "message": "The writer runs after the researcher."}]}
++    return {"passed": True, "feedback": [{"concept": "Sequence", "message": "The simulated pipeline declares researcher followed by writer; execution was not tested."}]}
+--- before/apps/executor/grading/tests/agents-research.py
++++ after/apps/executor/grading/tests/agents-research.py
+@@ -6,6 +6,9 @@
+     if "Planner" not in names or "Writer" not in names or "Manager" not in names:
+         return {"passed": False, "feedback": [{"concept": "Research team", "message": "Create Planner, Writer, and Manager."}]}
+     manager = [item for item in agents if item.get("arguments", {}).get("name") == "Manager"]
+-    if not manager or manager[-1].get("arguments", {}).get("handoffs") != 2:
++    args = manager[-1].get("arguments", {}) if manager else {}
++    if (not manager or args.get("valid_handoffs") is not True
++            or args.get("handoff_names") not in ('["Planner", "Writer"]', '["Writer", "Planner"]')
++            or result.get("valueType") != "Agent" or result.get("valueName") != "Manager"):
+         return {"passed": False, "feedback": [{"concept": "Handoffs", "message": "The manager hands off to both specialists."}]}
+-    return {"passed": True, "feedback": [{"concept": "Research team", "message": "The manager can delegate planning and writing."}]}
++    return {"passed": True, "feedback": [{"concept": "Research team", "message": "The simulated Manager declares Planner and Writer handoffs; orchestration was not executed."}]}
+--- before/apps/executor/grading/tests/lg-checkpointer.py
++++ after/apps/executor/grading/tests/lg-checkpointer.py
+@@ -1,7 +1,11 @@
++import json
+ CANARY_HIDDEN_ASSERTION = "CANARY_HIDDEN_ASSERTION_do_not_ship"
+ 
+ def grade(trace, result):
+     compiled = [item for item in trace if item.get("name") == "compile"]
+-    if not compiled or not compiled[-1].get("arguments", {}).get("checkpointer"):
+-        return {"passed": False, "feedback": [{"concept": "Checkpointer", "message": "Compile with the saver you were given. A pause cannot resume without it."}]}
+-    return {"passed": True, "feedback": [{"concept": "Checkpointer", "message": "The graph compiles with a checkpointer attached."}]}
++    args = compiled[-1].get("arguments", {}) if compiled else {}
++    graph = json.loads(args.get("graph", "{}"))
++    if (args.get("checkpointer_value") != "true" or graph.get("entry") != "draft"
++            or graph.get("nodes", {}).get("draft") is not True or result.get("valueType") != "StateGraph"):
++        return {"passed": False, "feedback": [{"concept": "Checkpointer", "message": "Register callable draft, enter at draft, compile with the supplied saver, and return the graph."}]}
++    return {"passed": True, "feedback": [{"concept": "Checkpointer", "message": "The simulation recorded draft as entry and the supplied saver at compile; persistence was not tested."}]}
+--- before/apps/executor/grading/tests/lg-project.py
++++ after/apps/executor/grading/tests/lg-project.py
+@@ -1,8 +1,13 @@
++import json
+ CANARY_HIDDEN_ASSERTION = "CANARY_HIDDEN_ASSERTION_do_not_ship"
+ 
+ def grade(trace, result):
+-    edges = [item for item in trace if item.get("name") == "add_edge"]
+-    nodes = [item.get("arguments", {}).get("name") for item in trace if item.get("name") == "add_node"]
+-    if "draft" not in nodes or not edges or edges[-1].get("arguments", {}).get("target") != "review":
+-        return {"passed": False, "feedback": [{"concept": "Graph", "message": "Start at draft and add an edge to review."}]}
+-    return {"passed": True, "feedback": [{"concept": "Graph", "message": "Draft leads to review, and the graph compiles."}]}
++    compiled = [item for item in trace if item.get("name") == "compile"]
++    graph = json.loads(compiled[-1].get("arguments", {}).get("graph", "{}")) if compiled else {}
++    nodes = graph.get("nodes", {})
++    if (result.get("valueType") != "StateGraph" or graph.get("entry") != "draft"
++            or nodes.get("draft") is not True or nodes.get("review") is not True
++            or ["draft", "review"] not in graph.get("edges", [])
++            or any(source not in nodes or target not in nodes for source, target in graph.get("edges", []))):
++        return {"passed": False, "feedback": [{"concept": "Graph", "message": "Register callable draft and review nodes, enter at draft, connect draft to review, then compile and return that graph."}]}
++    return {"passed": True, "feedback": [{"concept": "Graph", "message": "The simulation recorded a compiled graph with draft as entry and registered draft-to-review nodes."}]}
+--- before/apps/executor/grading/tests/pass-json-schema.py
++++ after/apps/executor/grading/tests/pass-json-schema.py
+@@ -1,9 +1,11 @@
++import json
+ CANARY_HIDDEN_ASSERTION = "CANARY_HIDDEN_ASSERTION_do_not_ship"
+ 
+ def grade(trace, result):
+     calls = [item for item in trace if item.get("name") == "responses.create"]
+-    if not calls or calls[-1].get("arguments", {}).get("schema_name") != "answer":
++    expected = json.dumps({"format": {"type": "json_schema", "name": "answer"}}, sort_keys=True)
++    if not calls or calls[-1].get("arguments", {}).get("text_format") != expected:
+         return {"passed": False, "feedback": [{"concept": "Structured output", "message": "Pass text with a schema named answer."}]}
+     if result.get("value") != "mocked-output":
+         return {"passed": False, "feedback": [{"concept": "output_text", "message": "Return response.output_text."}]}
+-    return {"passed": True, "feedback": [{"concept": "Structured output", "message": "The schema reached the request, and you returned the text."}]}
++    return {"passed": True, "feedback": [{"concept": "Structured output", "message": "The supplied format reached the simulated request unchanged, and you returned the text. Schema validity was not tested."}]}
+--- before/apps/executor/grading/tests/responses-capstone.py
++++ after/apps/executor/grading/tests/responses-capstone.py
+@@ -4,12 +4,16 @@
+     results = result.get("results") or []
+     calls = [item for item in trace if item.get("name") == "responses.create"]
+     inputs = [item.get("arguments", {}).get("input") for item in calls]
+-    if len(results) < 3 or results[0].get("value") != "mocked-output":
++    if len(results) != 4 or any(item.get("ok") is not True for item in results) or results[0].get("value") != "mocked-output":
+         return {"passed": False, "feedback": [{"concept": "output_text", "message": "A real prompt must return response.output_text."}]}
++    if inputs != ["ping", "__academy_fail__", "__academy_contrast__"] or [item.get("arguments", {}).get("outcome") for item in calls] != ["success", "error", "success"]:
++        return {"passed": False, "feedback": [{"concept": "Responses API", "message": "Call the simulated API for the real prompt and the failure case; skip blank prompts."}]}
++    if results[3].get("value") != "mocked-contrast-output":
++        return {"passed": False, "feedback": [{"concept": "output_text", "message": "Return the actual simulated response text for each prompt, not a fixed output."}]}
+     if "   " in inputs:
+         return {"passed": False, "feedback": [{"concept": "Blank prompt", "message": "Do not call the API when the prompt is blank."}]}
+     if results[1].get("value") != "":
+         return {"passed": False, "feedback": [{"concept": "Blank prompt", "message": "Return an empty string for a blank prompt."}]}
+     if not results[2].get("ok") or results[2].get("value") != "":
+         return {"passed": False, "feedback": [{"concept": "Exception", "message": "Catch a failed call and return an empty string."}]}
+-    return {"passed": True, "feedback": [{"concept": "Capstone", "message": "The function returns text, skips blank prompts, and survives a failed call."}]}
++    return {"passed": True, "feedback": [{"concept": "Capstone", "message": "The simulation observed a successful API call and a failed call; the function returned text and skipped the blank prompt."}]}

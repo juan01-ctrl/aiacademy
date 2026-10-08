@@ -1,0 +1,15 @@
+id: rag-cite
+title: Return the citation
+order: 1
+instructions:
+  - Search the index with the query.
+  - Return the source of the first hit.
+starterCode: |
+  from retrieval import Index
+
+  def cite(query: str) -> str:
+      index = Index()
+      return ""
+hints:
+  - search returns a list. The citation is the source key on the first dict.
+runtime: python

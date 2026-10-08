@@ -1,0 +1,39 @@
+id: blank-prompts
+title: Blank prompts
+summary: An empty string is still a prompt. Do not send it.
+durationMinutes: 18
+steps:
+  - id: empty-is-still-a-call
+    type: explanation
+    title: Empty is still a call
+    body:
+      - "input can be an empty string. responses.create will still run. The model will generate something, often a generic line, and your function will treat that line as an answer."
+      - "Three spaces are not a missing prompt. They are a string with no words. strip() is how you see that."
+      - "The bug is in your function. The model cannot know you meant to skip the call."
+    takeaway: Blank input is a programming mistake, not a model problem.
+    example: |
+      ask_llm("")
+      ask_llm("   ")
+  - id: guard-before-the-call
+    type: explanation
+    title: Guard before the call
+    body:
+      - "Check the prompt before you build the request. If strip() leaves nothing, return an empty string and do not call responses.create."
+      - "A call that does not happen cannot be billed, and it cannot come back as a fake answer."
+    takeaway: No text means no API call.
+    example: |
+      if not prompt.strip():
+          return ""
+  - id: strip-before-you-decide
+    type: explanation
+    title: Decide before you build the client call
+    body:
+      - "The check belongs before client.responses.create. If you call first and ignore the result, the request already happened."
+      - "A real prompt still goes through. Only the blank branch returns early."
+    takeaway: No text means no responses.create.
+    example: |
+      if not prompt.strip():
+          return ""
+  - id: practice-blank-prompt
+    type: exercise
+    exerciseId: skip-blank-prompt

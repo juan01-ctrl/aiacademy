@@ -1,0 +1,54 @@
+id: what-is-the-api
+title: What is the OpenAI API
+summary: The API is how a program asks a model to generate text, code, or JSON.
+durationMinutes: 16
+steps:
+  - id: oa-what-is-it
+    type: explanation
+    title: What is the OpenAI API
+    body:
+      - "The OpenAI API is a service your program calls to use a model. You send a prompt. The model generates text and returns it as data."
+      - "That text can be prose, code, a math expression, or JSON. The call for a direct text request is responses.create. You pass model and input. You read output_text."
+      - "There is no chat window in this call. Your function receives a response object and decides what to print, store, or pass to the next function."
+      - "The text guide uses this request. input is a one-sentence bedtime story. output_text is the sentence the model wrote."
+    takeaway: The API is a program call that returns generated text.
+    example: |
+      response = client.responses.create(
+          model="gpt-4.1-mini",
+          input="Write a one-sentence bedtime story about a unicorn.",
+      )
+      print(response.output_text)
+  - id: oa-what-for
+    type: explanation
+    title: What is it used for
+    body:
+      - "Use it when your application needs the model to write or transform text. A summary of a ticket. A label on a review. A product description. A JSON object the next function can parse."
+      - "A classifier sends the review as input and expects a label back. A summarizer sends the ticket and expects a shorter paragraph. Both are the same call, with a different prompt."
+      - "Do not use it when the answer is already stored. A price in a database does not need a model. A paragraph that does not exist yet does."
+    takeaway: Use it to generate or transform text inside your application.
+    example: |
+      response = client.responses.create(
+          model="gpt-4.1-mini",
+          input="Label this review as positive or negative: The battery died in an hour.",
+      )
+  - id: oa-what-you-will-learn
+    type: explanation
+    title: What you will practice here
+    body:
+      - "First you make that call and return output_text. Then you separate the standing rule from the user message."
+      - "After the text comes back, you ask for a JSON schema, set temperature, and offer a tool the model may request."
+      - "Last you skip a blank prompt and catch a raised error. The happy path comes before the failure path."
+    takeaway: Call, arguments, then failures.
+    example: |
+      print(response.output_text)
+  - id: oa-before-the-editor
+    type: explanation
+    title: Before the editor
+    body:
+      - "You do not need every field on the response. For generated text, return output_text. The raw output list can also hold tool calls, so it is the wrong return value when the caller asked for a sentence."
+      - "Run code shows the console. Submit answer runs the hidden tests."
+      - "The next step writes the call."
+    takeaway: Next you will call responses.create and return the text.
+    example: |
+      def ask_llm(prompt: str) -> str:
+          ...

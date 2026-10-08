@@ -1,0 +1,5 @@
+id: chain
+title: Two steps
+durationMinutes: 14
+lessonIds:
+  - draft-then-review

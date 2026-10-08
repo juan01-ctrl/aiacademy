@@ -1,0 +1,20 @@
+id: skip-blank-prompt
+title: Skip a blank prompt
+order: 3
+instructions:
+  - If the prompt is empty or only spaces, return an empty string.
+  - Do not call responses.create in that case.
+  - Otherwise send the prompt and return response.output_text.
+starterCode: |
+  from openai import OpenAI
+
+  def ask_llm(prompt: str) -> str:
+      client = OpenAI()
+      response = client.responses.create(
+          model="gpt-4.1-mini",
+          input=prompt,
+      )
+      return response.output_text
+hints:
+  - prompt.strip() tells you whether any non-space characters remain.
+runtime: python

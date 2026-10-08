@@ -1,0 +1,5 @@
+id: server
+title: Expose a tool
+durationMinutes: 14
+lessonIds:
+  - register-tool

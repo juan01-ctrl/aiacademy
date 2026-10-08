@@ -1,0 +1,20 @@
+"use client";
+
+export function EnrollButton({ courseId }: { courseId: string }) {
+  return (
+    <button
+      type="button"
+      className="btn btn-primary w-fit"
+      onClick={async () => {
+        const response = await fetch("/api/enroll", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ courseId }),
+        });
+        if (response.ok) window.location.reload();
+      }}
+    >
+      Enroll and start
+    </button>
+  );
+}

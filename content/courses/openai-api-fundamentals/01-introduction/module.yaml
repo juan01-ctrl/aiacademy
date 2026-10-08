@@ -1,0 +1,7 @@
+id: introduction
+title: Introduction to the API
+durationMinutes: 58
+lessonIds:
+  - what-is-the-api
+  - first-call
+  - instructions-vs-input

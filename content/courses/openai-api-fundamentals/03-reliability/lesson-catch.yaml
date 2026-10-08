@@ -1,0 +1,35 @@
+id: when-the-call-fails
+title: When the call fails
+summary: responses.create can raise. Catch it at the call and return an empty string.
+durationMinutes: 14
+steps:
+  - id: a-call-can-raise
+    type: explanation
+    title: A call can raise
+    body:
+      - "responses.create does not always return an object. A bad key, a network failure, or the provider can raise."
+      - "If you do not catch that exception, your function crashes. The caller gets a stack trace, not a string."
+    takeaway: Failure is a return path you have to write.
+    example: |
+      try:
+          response = client.responses.create(
+              model="gpt-4.1-mini",
+              input=prompt,
+          )
+      except Exception:
+          return ""
+  - id: catch-at-the-boundary
+    type: explanation
+    title: Catch at the boundary
+    body:
+      - "Catch around the API call, not around the whole program. On success, return output_text. On failure, return an empty string."
+      - "Do not return the exception object. The happy path returns a string. The failure path must return a string too."
+    takeaway: On failure, return an empty string. On success, return output_text.
+    example: |
+      try:
+          return response.output_text
+      except Exception:
+          return ""
+  - id: practice-catch
+    type: exercise
+    exerciseId: catch-api-error

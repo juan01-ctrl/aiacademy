@@ -1,0 +1,12 @@
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/lib/progress-store.ts
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/app/api/execute/route.ts
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/components/workspace/Workspace.tsx
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/components/course/CourseOverview.tsx
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/app/courses/[courseId]/project/page.tsx
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/packages/shared/src/index.ts
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/components/course/CourseOverview.test.tsx
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/lib/course-certificate.ts
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/lib/course-certificates.test.ts
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/components/workspace/workspace-navigation.ts
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/components/workspace/workspace-navigation.test.ts
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/app/courses/[courseId]/project/ProjectPage.test.tsx

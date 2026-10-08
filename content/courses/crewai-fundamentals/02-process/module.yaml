@@ -1,0 +1,5 @@
+id: process
+title: Choose the process
+durationMinutes: 14
+lessonIds:
+  - sequential-process

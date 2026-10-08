@@ -1,0 +1,12 @@
+id: agent-route
+title: Send billing to billing
+order: 3
+instructions:
+  - If kind is billing, return billing.
+  - Otherwise return tech.
+starterCode: |
+  def route(kind: str) -> str:
+      return "tech"
+hints:
+  - Compare kind to the string billing.
+runtime: python

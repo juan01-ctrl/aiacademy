@@ -1,0 +1,15 @@
+id: agent-loop-project
+title: Achieve a goal
+order: 1
+instructions:
+  - Put the goal in the first message list.
+  - Loop until tool is done. Run any other tool the model asks for.
+  - Return the text from the done turn.
+starterCode: |
+  from academy_loop import llm, run_tool
+
+  def achieve(goal: str) -> str:
+      return ""
+hints:
+  - messages start as [goal].
+runtime: python

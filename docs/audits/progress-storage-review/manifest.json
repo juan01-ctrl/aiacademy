@@ -1,0 +1,88 @@
+{
+  "scope": "Selected source text only; no live learner storage or Git status claim",
+  "changedPaths": [
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/lib/progress-store.ts",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/lib/course-certificates.test.ts",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/lib/progress-storage.test.ts",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/superpowers/plans/2026-10-07-progress-storage.md",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/README.md",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/before/progress-store.ts",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/after/progress-store.ts",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/before/course-certificates.test.ts",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/after/course-certificates.test.ts",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/after/progress-storage.test.ts",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/after/2026-10-07-progress-storage.md",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/after/README.md",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/baseline.txt",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/red.txt",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/green.txt",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/typecheck.txt",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/full.diff",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/manifest.json"
+  ],
+  "primaryFiles": [
+    {
+      "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/lib/progress-store.ts",
+      "kind": "modified",
+      "beforeSnapshot": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/before/progress-store.ts",
+      "beforeSha256": "b1bcaff0b17a2fc6192ac81c1d11cba14ffd1304fa0e42da9e863debefded27e",
+      "afterSnapshot": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/after/progress-store.ts",
+      "afterSha256": "85ad6ae324016b3f0d1b0e30fd343dfe19777fecf02544ac9a590e6fb8545314"
+    },
+    {
+      "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/lib/course-certificates.test.ts",
+      "kind": "modified",
+      "beforeSnapshot": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/before/course-certificates.test.ts",
+      "beforeSha256": "c8d324adfc879f42ff0c98f95b84cbf25171851eaa01cf168086662e3d26658c",
+      "afterSnapshot": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/after/course-certificates.test.ts",
+      "afterSha256": "1e9072cace2a4a4d142a926462ab7d300fbdcd99125b80ae341bf4f453e4610d"
+    },
+    {
+      "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/lib/progress-storage.test.ts",
+      "kind": "added",
+      "beforeSnapshot": null,
+      "beforeSha256": null,
+      "afterSnapshot": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/after/progress-storage.test.ts",
+      "afterSha256": "2ef63f68baff26778c4a7c71ce011258ee9d0e74c3071c5ce9657ee5b07f6c34"
+    },
+    {
+      "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/superpowers/plans/2026-10-07-progress-storage.md",
+      "kind": "added",
+      "beforeSnapshot": null,
+      "beforeSha256": null,
+      "afterSnapshot": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/after/2026-10-07-progress-storage.md",
+      "afterSha256": "2d9f73aad2d38981db9c65eed961c814ec7e44214ecdf4b31005649212bfefd7"
+    },
+    {
+      "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/README.md",
+      "kind": "added",
+      "beforeSnapshot": null,
+      "beforeSha256": null,
+      "afterSnapshot": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/after/README.md",
+      "afterSha256": "75daba60f2ad77e8d94e4fa439230598fc51b7aa705abae88c344b54ae7b3543"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/baseline.txt",
+      "sha256": "4c944a8c428cb50e0baa24e827d91d91e6f9e93b38f4699c8653f703eced1f02"
+    },
+    {
+      "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/red.txt",
+      "sha256": "6d55832503af6933f5c8b8b39680ac876817558381d234c749040d64cdf32856"
+    },
+    {
+      "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/green.txt",
+      "sha256": "ca51a80a4d0d3e05921bb878873a83ef478578e73a2f3e0b813afce3de95bc9b"
+    },
+    {
+      "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/typecheck.txt",
+      "sha256": "cf2098b720ae295a4582fddf178443b96e8fd64b971b0aa9ce99c40e758c0922"
+    },
+    {
+      "path": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/docs/audits/progress-storage-review/full.diff",
+      "sha256": "847ed746d884d4b63831b1b41e12bfe0f05368c5207c8786d32fd4fcbfcae767"
+    }
+  ],
+  "selfHash": "manifest.json excluded from self-hashing"
+}

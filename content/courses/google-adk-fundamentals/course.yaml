@@ -1,0 +1,9 @@
+id: google-adk-fundamentals
+title: Google ADK
+summary: ADK is Google's agent framework. An Agent has a name, a model, an instruction, and tools.
+level: Advanced
+durationMinutes: 50
+moduleIds:
+  - what-it-is
+  - first-agent
+  - sequence

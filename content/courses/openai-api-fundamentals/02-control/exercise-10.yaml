@@ -1,0 +1,20 @@
+id: pass-max-output-tokens
+title: Cap the reply
+order: 10
+instructions:
+  - Complete ask_with_limit so max_output_tokens reaches responses.create.
+  - Do not write the limit into the prompt string.
+  - Return response.output_text.
+starterCode: |
+  from openai import OpenAI
+
+  def ask_with_limit(prompt: str, limit: int) -> str:
+      client = OpenAI()
+      response = client.responses.create(
+          model="gpt-4.1-mini",
+          input=prompt,
+      )
+      return ""
+hints:
+  - The argument name is max_output_tokens.
+runtime: python

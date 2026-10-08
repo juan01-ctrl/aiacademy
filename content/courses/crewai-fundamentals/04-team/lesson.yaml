@@ -1,0 +1,30 @@
+id: writer-reads-research
+title: The writer reads the research
+summary: expected_output says what done looks like. context passes the previous task.
+durationMinutes: 14
+steps:
+  - id: crew-expected
+    type: explanation
+    title: expected_output
+    body:
+      - "expected_output is the shape of a finished task. A markdown report is a shape. Find the source is a goal on the agent, not the shape of this task."
+      - "The research task collects notes. The report task says what the notes must become."
+    takeaway: Put A markdown report. on the writer task.
+    example: |
+      Task(
+          description="Write the report",
+          agent=writer,
+          expected_output="A markdown report.",
+      )
+  - id: crew-context
+    type: explanation
+    title: context
+    body:
+      - "context is the list of earlier tasks this task may read. The writer should receive the research task, or the notes never arrive."
+      - "A crew of one role is not a team. Create a writer, then point the report task at the research task."
+    takeaway: Pass context=[research_task] on the writer task.
+    example: |
+      Task(description="Write the report", agent=writer, context=[research_task])
+  - id: crew-practice-context
+    type: exercise
+    exerciseId: crew-context

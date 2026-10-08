@@ -1,0 +1,5 @@
+id: sequence
+title: Researcher, then writer
+durationMinutes: 14
+lessonIds:
+  - pipeline

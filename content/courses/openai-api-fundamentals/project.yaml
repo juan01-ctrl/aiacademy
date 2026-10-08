@@ -1,0 +1,20 @@
+id: responses-capstone
+title: Final project
+order: 1
+instructions:
+  - Build ask_llm so a real prompt returns response.output_text.
+  - A blank prompt returns an empty string and does not call the API.
+  - If responses.create raises, return an empty string.
+starterCode: |
+  from openai import OpenAI
+
+  def ask_llm(prompt: str) -> str:
+      client = OpenAI()
+      response = client.responses.create(
+          model="gpt-4.1-mini",
+          input=prompt,
+      )
+      return response.output_text
+hints:
+  - Guard blank prompts before the call, and catch errors around the call.
+runtime: python

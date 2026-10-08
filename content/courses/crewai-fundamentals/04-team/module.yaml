@@ -1,0 +1,5 @@
+id: team
+title: A second role
+durationMinutes: 14
+lessonIds:
+  - writer-reads-research

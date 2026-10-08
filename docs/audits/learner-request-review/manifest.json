@@ -1,0 +1,28 @@
+{
+  "root": "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy",
+  "sourcePaths": [
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/components/workspace/Workspace.tsx",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/components/lesson/ExplanationStep.tsx",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/components/course/EnrollButton.tsx",
+    "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/components/workspace/learner-requests.test.tsx"
+  ],
+  "beforeSha256": {
+    "apps/web/src/components/workspace/Workspace.tsx": "e1871e3530e62adfcaa7b843d0d6fa06c19d23309d77882327e17a259989c223",
+    "apps/web/src/components/lesson/ExplanationStep.tsx": "d6c84d745a509e8f36debe28842e16f6d5e57d9399655d8e28e8ee34b706f1f6",
+    "apps/web/src/components/course/EnrollButton.tsx": "aab0a84196d313ef23caf8f6fa06d41501d2218cf86294dadd0b91140ef23e12"
+  },
+  "afterSha256": {
+    "apps/web/src/components/workspace/Workspace.tsx": "484b3807a2dad79ddb558af6e37e7c4fa2d5131b70e68772bf7e24827f8f85be",
+    "apps/web/src/components/lesson/ExplanationStep.tsx": "5250f43dbbabab9e14fc1cf552a2e1eb2db02cf0b9ef23909a5d74f72cd39460",
+    "apps/web/src/components/course/EnrollButton.tsx": "b9afc52077976248d0976ce442597bd7f6f523e93a0779990e68d2be8d94ebdd",
+    "apps/web/src/components/workspace/learner-requests.test.tsx": "a6ef3bb1859a4d7d56cb1b07c74e43f651d75ddd9aac6d38af6ce4c820291e05"
+  },
+  "checks": {
+    "RED": "26 failed / 4 passed (30 original regressions)",
+    "GREEN": "36 passed (includes supplementary auth/order/not-found variants)",
+    "fullWebSuite": "123 passed across 13 files",
+    "typecheck": "pass --noEmit --incremental false",
+    "browser": "not_verified",
+    "independentReview": "pending parent coordination"
+  }
+}

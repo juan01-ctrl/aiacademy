@@ -1,0 +1,5 @@
+id: patterns
+title: Two workflow patterns
+durationMinutes: 20
+lessonIds:
+  - chain-and-route

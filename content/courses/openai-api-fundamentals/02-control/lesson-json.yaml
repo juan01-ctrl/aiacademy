@@ -1,0 +1,36 @@
+id: structured-json
+title: Ask for JSON
+summary: Structured Outputs makes the model follow a JSON schema, so the next function gets fields.
+durationMinutes: 14
+steps:
+  - id: prose-is-brittle
+    type: explanation
+    title: Prose is brittle
+    body:
+      - "Structured Outputs makes the model follow a JSON schema you supply. The reply cannot omit a required key or invent a value outside an enum."
+      - "Use it when your application needs fields, not a paragraph. The calendar example extracts name, date, and participants from Alice and Bob are going to a science fair on Friday."
+      - "A sentence that says reply in JSON is a wish. The schema is what the API enforces. You do not need a strongly worded prompt to get the shape."
+    takeaway: If the next function needs a field, pass a schema.
+    example: |
+      text={
+          "format": {
+              "type": "json_schema",
+              "name": "event",
+          }
+      }
+  - id: pass-text-format
+    type: explanation
+    title: Pass the format
+    body:
+      - "On responses.create, the schema goes in the text argument, as text.format. It does not go inside the prompt string."
+      - "Use this when you want to structure the reply to the user. Use a tool when you want the model to call a function in your system. Those are different jobs."
+    takeaway: Pass text=text_format into responses.create.
+    example: |
+      client.responses.create(
+          model="gpt-4.1-mini",
+          input=prompt,
+          text=text_format,
+      )
+  - id: practice-schema
+    type: exercise
+    exerciseId: pass-json-schema

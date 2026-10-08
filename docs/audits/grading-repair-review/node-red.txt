@@ -1,0 +1,60 @@
+
+ RUN  v3.2.7 /Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy
+
+ ❯ apps/executor/src/grade-boundary.test.ts (12 tests | 10 failed) 198ms
+   × submit harness success boundary > rejects malformed or failed success null 23ms
+     → expected 'passed' to be 'failed' // Object.is equality
+   × submit harness success boundary > rejects malformed or failed success {} 20ms
+     → expected 'passed' to be 'failed' // Object.is equality
+   × submit harness success boundary > rejects malformed or failed success {"ok":false} 17ms
+     → expected 'passed' to be 'failed' // Object.is equality
+   × submit harness success boundary > rejects malformed or failed success {"ok":"true"} 17ms
+     → expected 'passed' to be 'failed' // Object.is equality
+   × submit harness success boundary > rejects malformed or failed success {"ok":1} 17ms
+     → expected 'passed' to be 'failed' // Object.is equality
+   × submit harness success boundary > rejects malformed or failed success %j 16ms
+     → expected 'passed' to be 'failed' // Object.is equality
+   × submit harness success boundary > rejects malformed or failed success "true" 17ms
+     → expected 'passed' to be 'failed' // Object.is equality
+   × submit harness success boundary > rejects malformed or failed success {"ok":true,"results":[{"ok":false}]} 18ms
+     → expected 'passed' to be 'failed' // Object.is equality
+   × submit harness success boundary > rejects malformed or failed success {"ok":true,"results":[]} 20ms
+     → expected 'passed' to be 'failed' // Object.is equality
+   × submit harness success boundary > rejects malformed or failed success {"ok":true,"results":"malformed"} 16ms
+     → expected 'passed' to be 'failed' // Object.is equality
+   ✓ submit harness success boundary > grades a successful harness result 16ms
+   ✓ submit harness success boundary > keeps Run ungraded even without a harness payload 0ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  apps/executor/src/grade-boundary.test.ts > submit harness success boundary > rejects malformed or failed success null
+ FAIL  apps/executor/src/grade-boundary.test.ts > submit harness success boundary > rejects malformed or failed success {}
+ FAIL  apps/executor/src/grade-boundary.test.ts > submit harness success boundary > rejects malformed or failed success {"ok":false}
+ FAIL  apps/executor/src/grade-boundary.test.ts > submit harness success boundary > rejects malformed or failed success {"ok":"true"}
+ FAIL  apps/executor/src/grade-boundary.test.ts > submit harness success boundary > rejects malformed or failed success {"ok":1}
+ FAIL  apps/executor/src/grade-boundary.test.ts > submit harness success boundary > rejects malformed or failed success %j
+ FAIL  apps/executor/src/grade-boundary.test.ts > submit harness success boundary > rejects malformed or failed success "true"
+ FAIL  apps/executor/src/grade-boundary.test.ts > submit harness success boundary > rejects malformed or failed success {"ok":true,"results":[{"ok":false}]}
+ FAIL  apps/executor/src/grade-boundary.test.ts > submit harness success boundary > rejects malformed or failed success {"ok":true,"results":[]}
+ FAIL  apps/executor/src/grade-boundary.test.ts > submit harness success boundary > rejects malformed or failed success {"ok":true,"results":"malformed"}
+AssertionError: expected 'passed' to be 'failed' // Object.is equality
+
+Expected: "failed"
+Received: "passed"
+
+ ❯ apps/executor/src/grade-boundary.test.ts:15:29
+     13|     run.mockResolvedValue({ status: "ok", stdout: "output", stderr: ""…
+     14|     const response = await submit();
+     15|     expect(response.status).toBe("failed");
+       |                             ^
+     16|     expect(response.feedback[0]?.concept).toBe("Function execution");
+     17|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  10 failed | 2 passed (12)
+   Start at  15:38:58
+   Duration  517ms (transform 66ms, setup 0ms, collect 75ms, tests 198ms, environment 0ms, prepare 53ms)
+

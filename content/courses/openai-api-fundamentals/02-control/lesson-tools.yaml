@@ -1,0 +1,44 @@
+id: call-a-tool
+title: Offer a tool
+summary: A tool is functionality you tell the model it can request. Your code still runs it.
+durationMinutes: 18
+steps:
+  - id: tools-are-not-magic
+    type: explanation
+    title: A tool is access you grant
+    body:
+      - "Function calling lets the model reach data and actions outside its training. A tool is a piece of functionality you tell the model it can use, defined by a name and a JSON schema of arguments."
+      - "A tool call is the model's request to use that tool. For what is the weather in Paris?, the model can return get_weather with location Paris. It does not call the weather service itself."
+      - "Your application executes the function, then sends the result back. The flow is request, tool call, your code, second request, final text."
+    takeaway: You declare the tool. You execute the tool.
+    example: |
+      tools=[{
+          "type": "function",
+          "name": "get_weather",
+          "parameters": {"type": "object", "properties": {"location": {"type": "string"}}},
+      }]
+  - id: pass-the-tool-list
+    type: explanation
+    title: Pass the tool list
+    body:
+      - "You include the tool list on responses.create, next to input. If get_weather is missing from that list, the model cannot ask for it."
+      - "This chapter only checks that the tool was offered. Running the weather function is the next request, after you read the tool call."
+    takeaway: Pass tools=tools into responses.create.
+    example: |
+      client.responses.create(
+          model="gpt-4.1-mini",
+          input=prompt,
+          tools=tools,
+      )
+  - id: tools-name-must-match
+    type: explanation
+    title: The name is the contract
+    body:
+      - "The name field is the name the model will use. get_weather is not the same tool as weather."
+      - "parameters describes the arguments. A location string is a different tool from a latitude and longitude pair, even if both are named get_weather."
+    takeaway: Offer the tool by the name the model must use.
+    example: |
+      {"type": "function", "name": "get_weather"}
+  - id: practice-tool
+    type: exercise
+    exerciseId: pass-tools

@@ -1,0 +1,15 @@
+id: agents-research
+title: Build the research team
+order: 4
+instructions:
+  - Create a Planner and a Writer.
+  - Create a Manager whose handoffs include both.
+  - Return the manager.
+starterCode: |
+  from agents import Agent
+
+  def build_research_team():
+      return None
+hints:
+  - handoffs=[planner, writer] goes on the Manager.
+runtime: python

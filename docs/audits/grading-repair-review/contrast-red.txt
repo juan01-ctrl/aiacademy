@@ -1,0 +1,13 @@
+....F...........
+======================================================================
+FAIL: test_capstone_rejects_hardcoded_text_after_real_calls (__main__.GradingContracts.test_capstone_rejects_hardcoded_text_after_real_calls)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 87, in test_capstone_rejects_hardcoded_text_after_real_calls
+    self.assertFalse(assess('responses-capstone', CAPSTONE.replace('return OpenAI().responses.create(model="gpt-4.1-mini", input=prompt).output_text', 'OpenAI().responses.create(model="gpt-4.1-mini", input=prompt)\n        return "mocked-output"')))
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.906s
+
+FAILED (failures=1)

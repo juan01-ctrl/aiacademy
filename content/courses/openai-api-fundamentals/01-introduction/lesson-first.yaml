@@ -1,0 +1,56 @@
+id: first-call
+title: Your first response
+summary: responses.create sends a prompt and returns a response object. The sentence is output_text.
+durationMinutes: 28
+steps:
+  - id: what-you-are-calling
+    type: explanation
+    title: What you are calling
+    body:
+      - "responses.create is the call that sends a prompt to a model and gets generated text back. You pass model and input. You get a response object, not a bare sentence."
+      - "model names which model runs the request. input is the prompt for this turn. A bedtime-story prompt goes in input. The story comes back on the object."
+      - "If you print the object, the next function has to know the response shape. If you return the generated sentence, the caller can use it."
+    takeaway: You are making a function call. The response is data.
+    example: |
+      response = client.responses.create(
+          model="gpt-4.1-mini",
+          input="Write a one-sentence bedtime story about a unicorn.",
+      )
+  - id: where-the-text-lives
+    type: explanation
+    title: Where the text lives
+    body:
+      - "output is a list of items the model produced. A simple reply has one message. The same list can also hold a tool call, so the sentence is not always the first item."
+      - "output_text joins every text item into one string. Use it when the caller asked for the generated text."
+      - "A story request should return the story string. Returning output forces the next line to dig through the list."
+    takeaway: Return response.output_text.
+    example: |
+      text = response.output_text
+  - id: practice-output-text
+    type: exercise
+    exerciseId: return-output-text
+  - id: the-model-is-an-argument
+    type: explanation
+    title: The model is an argument
+    body:
+      - "The model name is an argument of the request. The caller passes it. The function does not hide a model inside."
+      - "If you hard-code gpt-4.1-mini, a caller who passes another model name is ignored. The request still runs, and it runs the wrong model."
+    takeaway: A parameter you receive has to reach the API call.
+    example: |
+      def ask_with_model(prompt: str, model: str) -> str:
+          ...
+  - id: name-the-arguments
+    type: explanation
+    title: Name the arguments
+    body:
+      - "responses.create takes model and input by name. model=model passes the caller's model. input=prompt passes the caller's prompt."
+      - "A call can succeed and still be wrong if those names are missing or swapped."
+    takeaway: Pass model=model and input=prompt.
+    example: |
+      client.responses.create(
+          model=model,
+          input=prompt,
+      )
+  - id: practice-model
+    type: exercise
+    exerciseId: pass-the-model

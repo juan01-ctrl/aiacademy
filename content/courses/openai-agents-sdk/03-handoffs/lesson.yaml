@@ -1,0 +1,28 @@
+id: delegate
+title: Delegate the work
+summary: function_tool turns a Python function into a tool. handoffs lets a manager pass the turn to a specialist.
+durationMinutes: 14
+steps:
+  - id: sdk-tool
+    type: explanation
+    title: A function becomes a tool
+    body:
+      - "function_tool turns a Python function into a tool and builds the schema from the function. You pass that function in tools."
+      - "The model can ask for the tool. The SDK runs your function. You do not write the while loop yourself."
+    takeaway: Decorate the function, then pass it in tools.
+    example: |
+      @function_tool
+      def get_weather(city: str) -> str:
+          return "sunny"
+  - id: sdk-handoff
+    type: explanation
+    title: A handoff passes the turn
+    body:
+      - "A handoff lets one agent delegate a task to another agent. The specialist takes the turn."
+      - "A sales manager can hand off to an email specialist. Create both agents. Pass the specialist in the manager's handoffs list."
+    takeaway: handoffs is a list of agents, not a sentence in the instructions.
+    example: |
+      Agent(name="Sales manager", instructions="Delegate email work.", handoffs=[email_agent])
+  - id: sdk-practice-handoff
+    type: exercise
+    exerciseId: agents-handoff

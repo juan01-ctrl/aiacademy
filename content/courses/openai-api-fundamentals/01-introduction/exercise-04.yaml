@@ -1,0 +1,16 @@
+id: pass-instructions
+title: Pass instructions and input
+order: 4
+instructions:
+  - Send instructions and prompt to responses.create under those names.
+  - Do not put the instructions string in input.
+  - Return response.output_text.
+starterCode: |
+  from openai import OpenAI
+
+  def ask_with_instructions(prompt: str, instructions: str) -> str:
+      client = OpenAI()
+      return ""
+hints:
+  - responses.create accepts instructions and input as separate keyword arguments.
+runtime: python

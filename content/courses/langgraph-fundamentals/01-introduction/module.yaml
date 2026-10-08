@@ -1,0 +1,6 @@
+id: introduction
+title: What LangGraph is
+durationMinutes: 34
+lessonIds:
+  - what-is-langgraph
+  - first-node

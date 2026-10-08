@@ -1,0 +1,149 @@
+.FFF.FF.FFF.FFFFFFF.F.FF
+======================================================================
+FAIL: test_adk_rejects_wrong_order_or_non_agents (__main__.GradingContracts.test_adk_rejects_wrong_order_or_non_agents) (values='writer, researcher')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 108, in test_adk_rejects_wrong_order_or_non_agents
+    self.assertFalse(assess('adk-sequence', ADK.replace('researcher, writer]', values + ']')))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_adk_rejects_wrong_order_or_non_agents (__main__.GradingContracts.test_adk_rejects_wrong_order_or_non_agents) (values='researcher, researcher')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 108, in test_adk_rejects_wrong_order_or_non_agents
+    self.assertFalse(assess('adk-sequence', ADK.replace('researcher, writer]', values + ']')))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_adk_rejects_wrong_order_or_non_agents (__main__.GradingContracts.test_adk_rejects_wrong_order_or_non_agents) (values='object(), object()')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 108, in test_adk_rejects_wrong_order_or_non_agents
+    self.assertFalse(assess('adk-sequence', ADK.replace('researcher, writer]', values + ']')))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_capstone_rejects_fixed_output_without_api (__main__.GradingContracts.test_capstone_rejects_fixed_output_without_api)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 81, in test_capstone_rejects_fixed_output_without_api
+    self.assertFalse(assess('responses-capstone', 'def ask_llm(prompt): return "mocked-output" if prompt == "ping" else ""'))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_capstone_requires_the_failed_call (__main__.GradingContracts.test_capstone_requires_the_failed_call)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 84, in test_capstone_requires_the_failed_call
+    self.assertFalse(assess('responses-capstone', CAPSTONE.replace('if not prompt.strip():', 'if prompt == "__academy_fail__" or not prompt.strip():')))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_checkpointer_rejects_empty_or_unentered_graph (__main__.GradingContracts.test_checkpointer_rejects_empty_or_unentered_graph) (source='from langgraph.graph import StateGraph\nclass State(dict): pass\ndef draft(state): return state\ndef build_graph(saver):\n    graph = StateGraph(State)\n    pass\n    graph.set_entry_point("draft")\n    return graph.compile(checkpointer=saver)\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 130, in test_checkpointer_rejects_empty_or_unentered_graph
+    self.assertFalse(assess('lg-checkpointer', source))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_checkpointer_rejects_empty_or_unentered_graph (__main__.GradingContracts.test_checkpointer_rejects_empty_or_unentered_graph) (source='from langgraph.graph import StateGraph\nclass State(dict): pass\ndef draft(state): return state\ndef build_graph(saver):\n    graph = StateGraph(State)\n    graph.add_node("draft", draft)\n    pass\n    return graph.compile(checkpointer=saver)\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 130, in test_checkpointer_rejects_empty_or_unentered_graph
+    self.assertFalse(assess('lg-checkpointer', source))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_dispatcher_rejects_false_harness_success (__main__.GradingContracts.test_dispatcher_rejects_false_harness_success)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 136, in test_dispatcher_rejects_false_harness_success
+    self.assertFalse(assess('adk-project', '''from google.adk import Agent
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_graph_missing_entry_function_fails (__main__.GradingContracts.test_graph_missing_entry_function_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 90, in test_graph_missing_entry_function_fails
+    self.assertFalse(assess('lg-project', GRAPH.replace('def build_graph():', 'def unrelated():') + '\nunrelated()'))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_graph_rejects_invalid_construction (__main__.GradingContracts.test_graph_rejects_invalid_construction) (source='from langgraph.graph import StateGraph\nclass State(dict): pass\ndef draft(state): return state\ndef review(state): return state\ndef build_graph():\n    graph = StateGraph(State)\n    graph.add_node("draft", draft)\n    pass\n    graph.set_entry_point("draft")\n    graph.add_edge("draft", "review")\n    return graph.compile()\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 100, in test_graph_rejects_invalid_construction
+    self.assertFalse(assess('lg-project', source))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_graph_rejects_invalid_construction (__main__.GradingContracts.test_graph_rejects_invalid_construction) (source='from langgraph.graph import StateGraph\nclass State(dict): pass\ndef draft(state): return state\ndef review(state): return state\ndef build_graph():\n    graph = StateGraph(State)\n    graph.add_node("draft", draft)\n    graph.add_node("review", review)\n    pass\n    graph.add_edge("draft", "review")\n    return graph.compile()\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 100, in test_graph_rejects_invalid_construction
+    self.assertFalse(assess('lg-project', source))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_graph_rejects_invalid_construction (__main__.GradingContracts.test_graph_rejects_invalid_construction) (source='from langgraph.graph import StateGraph\nclass State(dict): pass\ndef draft(state): return state\ndef review(state): return state\ndef build_graph():\n    graph = StateGraph(State)\n    graph.add_node("draft", draft)\n    graph.add_node("review", review)\n    graph.set_entry_point("draft")\n    graph.add_edge("draft", "review")\n    return graph\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 100, in test_graph_rejects_invalid_construction
+    self.assertFalse(assess('lg-project', source))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_graph_rejects_invalid_construction (__main__.GradingContracts.test_graph_rejects_invalid_construction) (source='from langgraph.graph import StateGraph\nclass State(dict): pass\ndef draft(state): return state\ndef review(state): return state\ndef build_graph():\n    graph = StateGraph(State)\n    graph.add_node("draft", draft)\n    graph.add_node("review", review)\n    graph.set_entry_point("draft")\n    graph.add_edge("missing", "review")\n    return graph.compile()\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 100, in test_graph_rejects_invalid_construction
+    self.assertFalse(assess('lg-project', source))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_graph_rejects_invalid_construction (__main__.GradingContracts.test_graph_rejects_invalid_construction) (source='from langgraph.graph import StateGraph\nclass State(dict): pass\ndef draft(state): return state\ndef review(state): return state\ndef build_graph():\n    graph = StateGraph(State)\n    graph.add_node("draft", None)\n    graph.add_node("review", review)\n    graph.set_entry_point("draft")\n    graph.add_edge("draft", "review")\n    return graph.compile()\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 100, in test_graph_rejects_invalid_construction
+    self.assertFalse(assess('lg-project', source))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_graph_rejects_invalid_construction (__main__.GradingContracts.test_graph_rejects_invalid_construction) (source='from langgraph.graph import StateGraph\nclass State(dict): pass\ndef draft(state): return state\ndef review(state): return state\ndef build_graph():\n    graph = StateGraph(State)\n    other = StateGraph(State)\n    graph.add_node("draft", draft)\n    graph.add_node("review", review)\n    graph.set_entry_point("draft")\n    graph.add_edge("draft", "review")\n    return other.compile()\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 100, in test_graph_rejects_invalid_construction
+    self.assertFalse(assess('lg-project', source))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_schema_rejects_name_without_supplied_format (__main__.GradingContracts.test_schema_rejects_name_without_supplied_format)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 122, in test_schema_rejects_name_without_supplied_format
+    self.assertFalse(assess('pass-json-schema', SCHEMA.replace('text=text_format', 'text={"format": {"name": "answer"}}')))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_sdk_rejects_unrelated_or_duplicate_handoffs (__main__.GradingContracts.test_sdk_rejects_unrelated_or_duplicate_handoffs) (values='planner, planner')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 116, in test_sdk_rejects_unrelated_or_duplicate_handoffs
+    self.assertFalse(assess('agents-research', SDK.replace('planner, writer]', values + ']')))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_sdk_rejects_unrelated_or_duplicate_handoffs (__main__.GradingContracts.test_sdk_rejects_unrelated_or_duplicate_handoffs) (values='object(), object()')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 116, in test_sdk_rejects_unrelated_or_duplicate_handoffs
+    self.assertFalse(assess('agents-research', SDK.replace('planner, writer]', values + ']')))
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.877s
+
+FAILED (failures=18)

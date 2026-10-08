@@ -1,0 +1,13 @@
+...............F.
+======================================================================
+FAIL: test_sdk_rejects_returning_the_wrong_agent (__main__.GradingContracts.test_sdk_rejects_returning_the_wrong_agent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py", line 122, in test_sdk_rejects_returning_the_wrong_agent
+    self.assertFalse(assess('agents-research', SDK.replace('return Agent(name="Manager"', 'manager = Agent(name="Manager"') + '    return planner\n'))
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.936s
+
+FAILED (failures=1)

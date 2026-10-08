@@ -1,0 +1,45 @@
+id: what-is-the-sdk
+title: What is the Agents SDK
+summary: A small runtime around the Responses API. It owns the loop, the tools, and the handoffs.
+durationMinutes: 16
+steps:
+  - id: sdk-what
+    type: explanation
+    title: What is the Agents SDK
+    body:
+      - "The Agents SDK is a small Python package for agent apps. An Agent is a model with instructions and tools. Runner runs that agent until the task is done."
+      - "Use the Responses API when you want to own the loop yourself. Use the SDK when you want the runtime to manage turns, tool execution, guardrails, or handoffs."
+      - "The hello world creates an Assistant and calls Runner.run_sync. The sentence you print is result.final_output."
+    takeaway: Agent describes the worker. Runner runs it.
+    example: |
+      agent = Agent(name="Assistant", instructions="You are a helpful assistant")
+      result = Runner.run_sync(agent, "Write a haiku about recursion in programming.")
+      print(result.final_output)
+  - id: sdk-for
+    type: explanation
+    title: What is it used for
+    body:
+      - "Use it for a worker that may call tools and then answer. A sales agent that drafts an email. A research agent that searches, then writes."
+      - "Handoffs let one agent delegate to another. Agents as tools let a manager call a specialist and take the result back."
+      - "Do not use it for one prompt with no loop. That is responses.create."
+    takeaway: Use the SDK when the runtime should own the loop.
+    example: |
+      result.final_output
+  - id: sdk-practice-plan
+    type: explanation
+    title: What you will practice
+    body:
+      - "You will create the Assistant, run it, and return final_output."
+      - "Then you will register a function with function_tool and give a manager a handoff."
+    takeaway: Name, instructions, run, then tools and handoffs.
+    example: |
+      from agents import Agent, Runner
+  - id: sdk-before
+    type: explanation
+    title: Before the editor
+    body:
+      - "Constructing an Agent does not run it. Runner.run_sync is the call that starts the work."
+      - "The next lesson creates the Assistant."
+    takeaway: Next you will create an Agent named Assistant.
+    example: |
+      Agent(name="Assistant", instructions="You are a helpful assistant")

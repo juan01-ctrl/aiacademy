@@ -1,0 +1,21 @@
+id: pass-few-shot
+title: Pass the example
+order: 9
+instructions:
+  - Complete ask_with_example so the standing rule and the example go to instructions.
+  - The new question goes to input, not into the example.
+  - Return response.output_text.
+starterCode: |
+  from openai import OpenAI
+
+  def ask_with_example(question: str, example: str) -> str:
+      client = OpenAI()
+      response = client.responses.create(
+          model="gpt-4.1-mini",
+          instructions="Answer in one word.",
+          input=question,
+      )
+      return ""
+hints:
+  - Join the rule and the example in instructions. Leave the question in input.
+runtime: python

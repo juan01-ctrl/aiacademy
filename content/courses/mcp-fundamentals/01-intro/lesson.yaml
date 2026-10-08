@@ -1,0 +1,46 @@
+id: what-is-mcp
+title: What is MCP
+summary: An open standard for connecting an AI application to tools and data outside the model.
+durationMinutes: 16
+steps:
+  - id: mcp-what
+    type: explanation
+    title: What is MCP
+    body:
+      - "MCP is an open standard for connecting an AI application to external systems. Those systems can be data, such as files or a database, or tools, such as search."
+      - "Without a standard, every agent framework needs a custom adapter for every tool. MCP is the shared port. You build the tool once. Claude, ChatGPT, Cursor, and an agent SDK can all call it."
+      - "A server exposes the tools. A client inside the AI application connects to that server and offers those tools to the model."
+    takeaway: MCP connects an agent to tools it did not ship with.
+    example: |
+      mcp = FastMCP("weather")
+  - id: mcp-for
+    type: explanation
+    title: What is it used for
+    body:
+      - "Use it when the tool lives outside the agent process. A calendar, a database, a design file, a search index."
+      - "Do not use a new protocol for a function that already sits in the same file. That is function_tool or a normal Python call."
+    takeaway: Use MCP when the tool is a server, not a local function.
+    example: |
+      @mcp.tool()
+      def get_weather(city: str) -> str:
+          return "sunny"
+  - id: mcp-plan
+    type: explanation
+    title: What you will practice
+    body:
+      - "You will create a FastMCP server named weather and register get_weather on it."
+      - "The agent that calls this server comes later. This course is the server side of the port."
+    takeaway: Name the server, then register the tool.
+    example: |
+      mcp = FastMCP("weather")
+  - id: mcp-before
+    type: explanation
+    title: Before the editor
+    body:
+      - "FastMCP takes the server name. tool() is the decorator that publishes a function."
+      - "The function name is the tool name the model will see."
+    takeaway: Next you will expose get_weather.
+    example: |
+      @mcp.tool()
+      def get_weather(city: str) -> str:
+          return "sunny"

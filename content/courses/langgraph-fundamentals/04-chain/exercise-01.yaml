@@ -1,0 +1,26 @@
+id: lg-chain
+title: Connect draft to review
+order: 4
+instructions:
+  - Register nodes named draft and review.
+  - Connect draft to review.
+  - Set the entry point to draft and compile.
+  - Return the graph.
+starterCode: |
+  from langgraph.graph import StateGraph
+
+  class State(dict):
+      pass
+
+  def draft(state):
+      return {"notes": ["drafted"]}
+
+  def review(state):
+      return {"notes": ["reviewed"]}
+
+  def build_chain():
+      graph = StateGraph(State)
+      return graph
+hints:
+  - add_edge("draft", "review") after both add_node calls.
+runtime: python

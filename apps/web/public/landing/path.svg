@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 160" fill="none">
+  <rect width="880" height="160" rx="20" fill="#e7eef2"/>
+  <circle cx="70" cy="80" r="28" fill="#14283c"/>
+  <circle cx="230" cy="80" r="28" fill="#0f5c73"/>
+  <circle cx="390" cy="80" r="28" fill="#c9842a"/>
+  <circle cx="550" cy="80" r="28" fill="#1f7a4d"/>
+  <circle cx="710" cy="80" r="28" fill="#14283c"/>
+  <path d="M98 80h104M258 80h104M418 80h104M578 80h104" stroke="#14283c" stroke-width="3" stroke-dasharray="6 6"/>
+  <text x="70" y="86" text-anchor="middle" fill="#fff" font-size="16" font-family="ui-sans-serif">1</text>
+  <text x="230" y="86" text-anchor="middle" fill="#fff" font-size="16" font-family="ui-sans-serif">2</text>
+  <text x="390" y="86" text-anchor="middle" fill="#fff" font-size="16" font-family="ui-sans-serif">3</text>
+  <text x="550" y="86" text-anchor="middle" fill="#fff" font-size="16" font-family="ui-sans-serif">4</text>
+  <text x="710" y="86" text-anchor="middle" fill="#fff" font-size="16" font-family="ui-sans-serif">5</text>
+</svg>

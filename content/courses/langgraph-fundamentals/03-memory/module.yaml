@@ -1,0 +1,5 @@
+id: memory
+title: Pause and resume
+durationMinutes: 14
+lessonIds:
+  - checkpointer

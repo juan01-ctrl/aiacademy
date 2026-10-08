@@ -1,0 +1,22 @@
+
+ RUN  v3.2.7 /Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web
+
+ ✓ src/components/nav/Navbar.test.tsx (2 tests) 6ms
+ ✓ src/app/auth/AuthPage.test.tsx (3 tests) 7ms
+ ✓ src/components/auth/LoginForm.test.tsx (6 tests) 10ms
+ ✓ src/components/course/CourseOverview.test.tsx (3 tests) 9ms
+ ✓ src/components/workspace/learner-requests.test.tsx (36 tests) 39ms
+ ✓ src/app/courses/[courseId]/project/ProjectPage.test.tsx (4 tests) 15ms
+ ✓ src/components/home/Landing.test.tsx (7 tests) 31ms
+ ✓ src/lib/course-certificates.test.ts (24 tests) 36ms
+ ✓ src/lib/auth-routes.test.ts (4 tests) 2ms
+ ✓ src/components/course/CourseProgress.test.tsx (3 tests) 12ms
+ ✓ src/components/workspace/workspace-navigation.test.ts (3 tests) 1ms
+ ✓ src/lib/course-completion.test.ts (2 tests) 1ms
+ ✓ src/lib/progress-storage.test.ts (26 tests) 456ms
+
+ Test Files  13 passed (13)
+      Tests  123 passed (123)
+   Start at  17:14:39
+   Duration  788ms (transform 492ms, setup 0ms, collect 1.78s, tests 625ms, environment 2ms, prepare 1.10s)
+

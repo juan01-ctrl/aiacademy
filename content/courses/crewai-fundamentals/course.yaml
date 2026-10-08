@@ -1,0 +1,10 @@
+id: crewai-fundamentals
+title: CrewAI Fundamentals
+summary: Give an agent a role, give a task an owner, then run the crew in order.
+level: Advanced
+durationMinutes: 82
+moduleIds:
+  - introduction
+  - process
+  - crews
+  - team

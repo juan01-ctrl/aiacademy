@@ -1,0 +1,393 @@
+
+ RUN  v3.2.7 /Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web
+
+ ✓ src/components/course/CourseProgress.test.tsx (3 tests) 14ms
+ ✓ src/components/auth/LoginForm.test.tsx (6 tests) 9ms
+ ✓ src/components/nav/Navbar.test.tsx (2 tests) 6ms
+ ✓ src/app/auth/AuthPage.test.tsx (3 tests) 23ms
+ ✓ src/components/course/CourseOverview.test.tsx (3 tests) 19ms
+ ✓ src/app/courses/[courseId]/project/ProjectPage.test.tsx (4 tests) 18ms
+ ✓ src/lib/course-certificates.test.ts (24 tests) 16ms
+ ✓ src/components/home/Landing.test.tsx (7 tests) 87ms
+ ✓ src/components/workspace/workspace-navigation.test.ts (3 tests) 2ms
+ ✓ src/lib/auth-routes.test.ts (4 tests) 2ms
+ ✓ src/lib/course-completion.test.ts (2 tests) 1ms
+ ❯ src/lib/progress-storage.test.ts (26 tests | 22 failed) 432ms
+   × fail-closed progress storage > surfaces EACCES without replacing storage 186ms
+     → promise resolved "{ enrolledCourseIds: [], …(8) }" instead of rejecting
+   × fail-closed progress storage > surfaces EIO without replacing storage 11ms
+     → promise resolved "{ enrolledCourseIds: [], …(8) }" instead of rejecting
+   × fail-closed progress storage > rejects malformed storage {bad without a write 6ms
+     → promise resolved "{ enrolledCourseIds: [ 'new' ], …(8) }" instead of rejecting
+   ✓ fail-closed progress storage > rejects malformed storage null without a write 17ms
+   ✓ fail-closed progress storage > rejects malformed storage [] without a write 10ms
+   ✓ fail-closed progress storage > rejects malformed storage {} without a write 11ms
+   × fail-closed progress storage > rejects malformed storage {"learners":[]} without a write 8ms
+     → promise resolved "{ enrolledCourseIds: [ 'new' ], …(8) }" instead of rejecting
+   × fail-closed progress storage > rejects malformed storage {"learners":{"x":null}} without a write 12ms
+     → promise resolved "{ enrolledCourseIds: [ 'new' ], …(8) }" instead of rejecting
+   × fail-closed progress storage > rejects malformed storage {"learners":{"x":{"drafts":[]}}} without a write 14ms
+     → promise resolved "{ enrolledCourseIds: [ 'new' ], …(8) }" instead of rejecting
+   × fail-closed progress storage > rejects malformed storage {"learners":{"x":{"passedExerciseIds":[1]}}} without a write 10ms
+     → promise resolved "{ enrolledCourseIds: [ 'new' ], …(8) }" instead of rejecting
+   × fail-closed progress storage > rejects malformed storage {"learners":{"x":{"certificate":{}}}} without a write 13ms
+     → promise resolved "{ enrolledCourseIds: [ 'new' ], …(8) }" instead of rejecting
+   × fail-closed progress storage > rejects malformed storage {"learners":{"x":{"certificatesByCourseId":{"a":null}}}} without a write 15ms
+     → promise resolved "{ enrolledCourseIds: [ 'new' ], …(8) }" instead of rejecting
+   × fail-closed progress storage > rejects malformed storage {"learners":{"x":{"attempts":[{}]}}} without a write 5ms
+     → promise resolved "{ enrolledCourseIds: [ 'new' ], …(8) }" instead of rejecting
+   × fail-closed progress storage > rejects malformed storage {"learners":{"x":{"assessmentPassed":"yes"}}} without a write 13ms
+     → promise resolved "{ enrolledCourseIds: [ 'new' ], …(8) }" instead of rejecting
+   ✓ fail-closed progress storage > initializes only absent storage and persists a readable enrollment 15ms
+   × fail-closed progress storage > leaves committed data intact on open failure 9ms
+     → promise resolved "undefined" instead of rejecting
+   × fail-closed progress storage > leaves committed data intact on write failure 11ms
+     → promise resolved "undefined" instead of rejecting
+   × fail-closed progress storage > leaves committed data intact on close failure 6ms
+     → promise resolved "undefined" instead of rejecting
+   × fail-closed progress storage > leaves committed data intact on rename failure 9ms
+     → promise resolved "undefined" instead of rejecting
+   × fail-closed progress storage > leaves committed data intact on cleanup failure 7ms
+     → promise resolved "undefined" instead of rejecting
+   × fail-closed progress storage > does not delete an unowned temporary file when exclusive creation fails 8ms
+     → promise resolved "{ enrolledCourseIds: [ …(2) ], …(8) }" instead of rejecting
+   × fail-closed progress storage > preserves both course credentials, unknown fields and prior progress across all mutations 7ms
+     → expected { enrolledCourseIds: [ …(2) ], …(8) } to match object { custom: { retained: true }, …(4) }
+(5 matching properties omitted from actual)
+   × fail-closed progress storage > coordinates independent module instances without losing either mutation 13ms
+     → expected [ 'courseA', 'two' ] to deeply equal [ 'courseA', 'one', 'two' ]
+   × fail-closed progress storage > times out without removing a potentially live lock or changing data 6ms
+     → expected null to be an instance of Error
+   × fail-closed progress storage > surfaces lock errors and never removes another owner's lock 6ms
+     → promise resolved "{ enrolledCourseIds: [ …(2) ], …(8) }" instead of rejecting
+   × fail-closed progress storage > surfaces release errors and never removes another owner's lock 4ms
+     → promise resolved "{ enrolledCourseIds: [ …(2) ], …(8) }" instead of rejecting
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 22 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > surfaces EACCES without replacing storage
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > surfaces EIO without replacing storage
+AssertionError: promise resolved "{ enrolledCourseIds: [], …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "assessmentCourseIds": [],
++   "assessmentPassed": false,
++   "attempts": [],
++   "certificate": null,
++   "certificatesByCourseId": {},
++   "completedStepIds": [],
++   "drafts": {},
++   "enrolledCourseIds": [],
++   "passedExerciseIds": [],
+  }
+
+ ❯ src/lib/progress-storage.test.ts:67:45
+     65|   it.each(["EACCES", "EIO"])("surfaces %s without replacing storage", …
+     66|     const store = await import("./progress-store"); const before = dis…
+     67|     await expect(store.getLearner("learner")).rejects.toThrow(code);
+       |                                             ^
+     68|     await expect(store.enroll("learner", "new")).rejects.toThrow(code);
+     69|     expect(disk.files.get(file)).toBe(before); expect(disk.locks.size)…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/22]⎯
+
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > rejects malformed storage {bad without a write
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > rejects malformed storage {"learners":[]} without a write
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > rejects malformed storage {"learners":{"x":null}} without a write
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > rejects malformed storage {"learners":{"x":{"drafts":[]}}} without a write
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > rejects malformed storage {"learners":{"x":{"passedExerciseIds":[1]}}} without a write
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > rejects malformed storage {"learners":{"x":{"certificate":{}}}} without a write
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > rejects malformed storage {"learners":{"x":{"certificatesByCourseId":{"a":null}}}} without a write
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > rejects malformed storage {"learners":{"x":{"attempts":[{}]}}} without a write
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > rejects malformed storage {"learners":{"x":{"assessmentPassed":"yes"}}} without a write
+AssertionError: promise resolved "{ enrolledCourseIds: [ 'new' ], …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "assessmentCourseIds": [],
++   "assessmentPassed": false,
++   "attempts": [],
++   "certificate": null,
++   "certificatesByCourseId": {},
++   "completedStepIds": [],
++   "drafts": {},
++   "enrolledCourseIds": [
++     "new",
++   ],
++   "passedExerciseIds": [],
+  }
+
+ ❯ src/lib/progress-storage.test.ts:77:48
+     75|   ])("rejects malformed storage %s without a write", async (text) => {
+     76|     disk.files.set(file, text); const store = await import("./progress…
+     77|     await expect(store.enroll("learner", "new")).rejects.toThrow();
+       |                                                ^
+     78|     expect(disk.files.get(file)).toBe(text); expect(disk.files.size).t…
+     79|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/22]⎯
+
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > leaves committed data intact on open failure
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > leaves committed data intact on write failure
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > leaves committed data intact on close failure
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > leaves committed data intact on rename failure
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > leaves committed data intact on cleanup failure
+AssertionError: promise resolved "undefined" instead of rejecting
+
+- Expected: 
+Error {
+  "message": "rejected promise",
+}
+
++ Received: 
+undefined
+
+ ❯ src/lib/progress-storage.test.ts:89:61
+     87|   it.each(["open", "write", "close", "rename", "cleanup"])("leaves com…
+     88|     const before = disk.files.get(file); disk.fault = fault; const sto…
+     89|     await expect(store.saveDraft("learner", "new", "source")).rejects.…
+       |                                                             ^
+     90|     expect(disk.files.get(file)).toBe(before); expect(disk.locks.size)…
+     91|     expect(disk.files.size).toBe(fault === "cleanup" ? 2 : 1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/22]⎯
+
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > does not delete an unowned temporary file when exclusive creation fails
+AssertionError: promise resolved "{ enrolledCourseIds: [ …(2) ], …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "assessmentCourseIds": [
++     "openai-api-fundamentals",
++   ],
++   "assessmentPassed": true,
++   "attempts": [
++     {
++       "at": "2020",
++       "exerciseId": "old-pass",
++       "id": "old",
++       "status": "passed",
++     },
++   ],
++   "certificate": {
++     "courseId": "courseA",
++     "extra": "keep",
++     "holderName": "History",
++     "id": "A",
++     "issuedAt": "2020",
++     "skills": [
++       "Historical skill",
++     ],
++     "title": "Original",
++   },
++   "certificatesByCourseId": {
++     "courseA": {
++       "courseId": "courseA",
++       "extra": "keep",
++       "holderName": "History",
++       "id": "A",
++       "issuedAt": "2020",
++       "skills": [
++         "Historical skill",
++       ],
++       "title": "Original",
++     },
++     "courseB": {
++       "courseId": "courseB",
++       "extra": "keep",
++       "holderName": "History",
++       "id": "B",
++       "issuedAt": "2020",
++       "skills": [
++         "Historical skill",
++       ],
++       "title": "Original",
++     },
++   },
++   "completedStepIds": [
++     "old-step",
++   ],
++   "drafts": {
++     "old": "saved",
++   },
++   "enrolledCourseIds": [
++     "courseA",
++     "new",
++   ],
++   "passedExerciseIds": [
++     "old-pass",
++   ],
+  }
+
+ ❯ src/lib/progress-storage.test.ts:95:48
+     93|   it("does not delete an unowned temporary file when exclusive creatio…
+     94|     disk.fault = "collision"; const before = disk.files.get(file); con…
+     95|     await expect(store.enroll("learner", "new")).rejects.toThrow("EEXI…
+       |                                                ^
+     96|     expect(disk.files.get(disk.leftovers)).toBe("someone else's temp")…
+     97|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/22]⎯
+
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > preserves both course credentials, unknown fields and prior progress across all mutations
+AssertionError: expected { enrolledCourseIds: [ …(2) ], …(8) } to match object { custom: { retained: true }, …(4) }
+(5 matching properties omitted from actual)
+
+- Expected
++ Received
+
+@@ -36,13 +36,10 @@
+          "Historical skill",
+        ],
+        "title": "Original",
+      },
+    },
+-   "custom": {
+-     "retained": true,
+-   },
+    "drafts": {
+      "new": "source",
+      "old": "saved",
+    },
+  }
+
+ ❯ src/lib/progress-storage.test.ts:105:36
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/22]⎯
+
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > coordinates independent module instances without losing either mutation
+AssertionError: expected [ 'courseA', 'two' ] to deeply equal [ 'courseA', 'one', 'two' ]
+
+- Expected
++ Received
+
+  [
+    "courseA",
+-   "one",
+    "two",
+  ]
+
+ ❯ src/lib/progress-storage.test.ts:116:65
+    114|     const work = Promise.all([one.enroll("learner", "one"), two.enroll…
+    115|     await vi.runAllTimersAsync(); await work;
+    116|     expect((await two.getLearner("learner")).enrolledCourseIds).toEqua…
+       |                                                                 ^
+    117|     expect(disk.locks.size).toBe(0);
+    118|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/22]⎯
+
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > times out without removing a potentially live lock or changing data
+AssertionError: expected null to be an instance of Error
+ ❯ src/lib/progress-storage.test.ts:122:56
+    120|     vi.useFakeTimers(); disk.locks.add(lock); const before = disk.file…
+    121|     const result = store.enroll("learner", "new").then(() => null, (er…
+    122|     await vi.runAllTimersAsync(); expect(await result).toBeInstanceOf(…
+       |                                                        ^
+    123|     expect((await result)?.message).toMatch(/lock.*timed out/i);
+    124|     expect(disk.locks.has(lock)).toBe(true); expect(disk.files.get(fil…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/22]⎯
+
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > surfaces lock errors and never removes another owner's lock
+ FAIL  src/lib/progress-storage.test.ts > fail-closed progress storage > surfaces release errors and never removes another owner's lock
+AssertionError: promise resolved "{ enrolledCourseIds: [ …(2) ], …(8) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "assessmentCourseIds": [
++     "openai-api-fundamentals",
++   ],
++   "assessmentPassed": true,
++   "attempts": [
++     {
++       "at": "2020",
++       "exerciseId": "old-pass",
++       "id": "old",
++       "status": "passed",
++     },
++   ],
++   "certificate": {
++     "courseId": "courseA",
++     "extra": "keep",
++     "holderName": "History",
++     "id": "A",
++     "issuedAt": "2020",
++     "skills": [
++       "Historical skill",
++     ],
++     "title": "Original",
++   },
++   "certificatesByCourseId": {
++     "courseA": {
++       "courseId": "courseA",
++       "extra": "keep",
++       "holderName": "History",
++       "id": "A",
++       "issuedAt": "2020",
++       "skills": [
++         "Historical skill",
++       ],
++       "title": "Original",
++     },
++     "courseB": {
++       "courseId": "courseB",
++       "extra": "keep",
++       "holderName": "History",
++       "id": "B",
++       "issuedAt": "2020",
++       "skills": [
++         "Historical skill",
++       ],
++       "title": "Original",
++     },
++   },
++   "completedStepIds": [
++     "old-step",
++   ],
++   "drafts": {
++     "old": "saved",
++   },
++   "enrolledCourseIds": [
++     "courseA",
++     "new",
++   ],
++   "passedExerciseIds": [
++     "old-pass",
++   ],
+  }
+
+ ❯ src/lib/progress-storage.test.ts:128:48
+    126|   it.each(["lock", "release"])("surfaces %s errors and never removes a…
+    127|     disk.fault = fault; const store = await import("./progress-store");
+    128|     await expect(store.enroll("learner", "new")).rejects.toThrow("EACC…
+       |                                                ^
+    129|     expect(disk.locks.size).toBe(fault === "release" ? 1 : 0);
+    130|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/22]⎯
+
+
+ Test Files  1 failed | 11 passed (12)
+      Tests  22 failed | 65 passed (87)
+   Start at  17:01:41
+   Duration  1.19s (transform 786ms, setup 0ms, collect 2.38s, tests 630ms, environment 2ms, prepare 2.37s)
+

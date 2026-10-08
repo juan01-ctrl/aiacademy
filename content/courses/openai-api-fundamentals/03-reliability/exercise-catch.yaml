@@ -1,0 +1,20 @@
+id: catch-api-error
+title: Catch a failed call
+order: 5
+instructions:
+  - Call responses.create for every non-blank prompt.
+  - If that call raises, return an empty string.
+  - If it succeeds, return response.output_text.
+starterCode: |
+  from openai import OpenAI
+
+  def ask_llm(prompt: str) -> str:
+      client = OpenAI()
+      response = client.responses.create(
+          model="gpt-4.1-mini",
+          input=prompt,
+      )
+      return response.output_text
+hints:
+  - Put the API call in try. The except branch should return "", not the error.
+runtime: python

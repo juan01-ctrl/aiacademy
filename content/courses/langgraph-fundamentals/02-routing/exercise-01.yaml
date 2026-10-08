@@ -1,0 +1,27 @@
+id: lg-route
+title: Add a conditional route
+order: 1
+instructions:
+  - Add a conditional edge from review.
+  - The route map must include approve and revise.
+  - Return the compiled graph.
+starterCode: |
+  from langgraph.graph import StateGraph
+
+  class State(dict):
+      pass
+
+  def review(state):
+      return state
+
+  def router(state):
+      return "approve" if state.get("ok") else "revise"
+
+  def build_graph():
+      graph = StateGraph(State)
+      graph.add_node("review", review)
+      graph.set_entry_point("review")
+      return graph.compile()
+hints:
+  - add_conditional_edges takes the source node, the router, and a dict of route names.
+runtime: python

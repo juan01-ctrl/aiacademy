@@ -1,0 +1,45 @@
+id: shots-and-limits
+title: Examples and limits
+summary: Examples of a correct reply belong in instructions. A length cap is max_output_tokens.
+durationMinutes: 20
+steps:
+  - id: oa-zero-shot
+    type: explanation
+    title: Zero-shot is a request with no example
+    body:
+      - "Zero-shot means you describe the job and send the message. You do not include a finished example."
+      - "instructions is Answer in one word. input is What is 2 + 2? That is enough when the job is obvious."
+    takeaway: No example yet. The rule and the message are enough.
+    example: |
+      instructions="Answer in one word."
+      input="What is 2 + 2?"
+  - id: oa-few-shot
+    type: explanation
+    title: Few-shot puts the example in the request
+    body:
+      - "instructions can include examples of a correct response. One example is one-shot. Several examples are few-shot."
+      - "The example stays with the rule, in instructions. The new question stays in input. A comment in your Python file is not part of the request."
+      - "Example in instructions: Q: capital of France? A: Paris. The new input is capital of Spain?"
+    takeaway: The example has to reach instructions. The question stays in input.
+    example: |
+      instructions="Answer in one word. Example: Q: capital of France? A: Paris"
+      input="capital of Spain?"
+  - id: oa-practice-few-shot
+    type: exercise
+    exerciseId: pass-few-shot
+  - id: oa-max-tokens
+    type: explanation
+    title: A length limit is an argument
+    body:
+      - "max_output_tokens caps how many tokens the model may generate for this reply. It is an argument of the request, like temperature."
+      - "Writing be brief in the prompt does not set that cap. A label that must be one word can pass a small limit. A paragraph summary needs a higher one."
+    takeaway: Pass max_output_tokens through. Do not hide the limit in the prompt.
+    example: |
+      client.responses.create(
+          model="gpt-4.1-mini",
+          input=prompt,
+          max_output_tokens=32,
+      )
+  - id: oa-practice-max-tokens
+    type: exercise
+    exerciseId: pass-max-output-tokens

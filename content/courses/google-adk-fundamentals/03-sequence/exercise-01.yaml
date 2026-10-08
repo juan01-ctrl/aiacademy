@@ -1,0 +1,15 @@
+id: adk-sequence
+title: Build the pipeline
+order: 2
+instructions:
+  - Create a researcher agent and a writer agent.
+  - Put them in a SequentialAgent named pipeline, researcher first.
+  - Return the pipeline.
+starterCode: |
+  from google.adk import Agent, SequentialAgent
+
+  def build_pipeline():
+      return None
+hints:
+  - sub_agents is a list of two agents.
+runtime: python

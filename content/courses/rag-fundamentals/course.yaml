@@ -1,0 +1,9 @@
+id: rag-fundamentals
+title: RAG Fundamentals
+summary: Split a document, index the chunks, then answer from what you retrieved.
+level: Intermediate
+durationMinutes: 72
+moduleIds:
+  - introduction
+  - retrieval
+  - empty-hits

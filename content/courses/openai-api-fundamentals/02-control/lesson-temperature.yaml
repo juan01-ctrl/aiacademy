@@ -1,0 +1,35 @@
+id: temperature
+title: Temperature is an argument
+summary: Generated text is not one fixed sentence. Temperature is the sampling argument on the request.
+durationMinutes: 14
+steps:
+  - id: oa-same-prompt-can-vary
+    type: explanation
+    title: The same prompt can vary
+    body:
+      - "Text from a model is not deterministic. The same prompt can produce a different continuation, because the model samples the next tokens."
+      - "temperature is the argument that scales that sampling. Near 0, the more likely tokens dominate. A higher value lets less likely tokens through."
+      - "An invoice parser passes temperature=0 so a total stays a total. A headline writer can pass a higher value when another wording is the point."
+    takeaway: Set temperature for the consumer of the text.
+    example: |
+      client.responses.create(
+          model="gpt-4.1-mini",
+          input=prompt,
+          temperature=0,
+      )
+  - id: oa-do-not-bury-it
+    type: explanation
+    title: Do not bury it in the prompt
+    body:
+      - "Writing be deterministic in input does not set the sampling parameter. The API reads temperature from the argument."
+      - "Pass the number you were given. Hard-coding a different number changes the request the caller asked for."
+    takeaway: Pass temperature=temperature into responses.create.
+    example: |
+      client.responses.create(
+          model="gpt-4.1-mini",
+          input=prompt,
+          temperature=temperature,
+      )
+  - id: oa-practice-temperature
+    type: exercise
+    exerciseId: pass-temperature

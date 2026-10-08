@@ -1,0 +1,32 @@
+id: chain-and-route
+title: Chain, then route
+summary: Chaining feeds one result into the next call. Routing picks a specialist before the work starts.
+durationMinutes: 20
+steps:
+  - id: agent-chain-idea
+    type: explanation
+    title: Chaining
+    body:
+      - "Prompt chaining splits one job into smaller calls. The output of the first call is the input of the second."
+      - "draft writes a first pass. judge reads that pass, not the original prompt. If you send the original prompt to both, you did not chain anything."
+    takeaway: The second function receives what the first function returned.
+    example: |
+      first = draft(prompt)
+      return judge(first)
+  - id: agent-practice-chain
+    type: exercise
+    exerciseId: agent-chain
+  - id: agent-route-idea
+    type: explanation
+    title: Routing
+    body:
+      - "Routing chooses who handles the request before the work starts. A billing question goes to billing. Anything else goes to tech."
+      - "The choice is your code, not a longer prompt. The specialist is a name you return."
+    takeaway: Return billing or tech. Do not answer the question here.
+    example: |
+      if kind == "billing":
+          return "billing"
+      return "tech"
+  - id: agent-practice-route
+    type: exercise
+    exerciseId: agent-route

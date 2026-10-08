@@ -1,0 +1,20 @@
+id: pass-tools
+title: Offer a tool
+order: 6
+instructions:
+  - Send the tools list into responses.create.
+  - The tool name must be get_weather.
+  - Return response.output_text.
+starterCode: |
+  from openai import OpenAI
+
+  def ask_with_tool(prompt: str, tools: list) -> str:
+      client = OpenAI()
+      response = client.responses.create(
+          model="gpt-4.1-mini",
+          input=prompt,
+      )
+      return response.output_text
+hints:
+  - responses.create accepts a tools keyword. Do not hide the list inside input.
+runtime: python

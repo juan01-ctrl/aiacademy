@@ -1,0 +1,16 @@
+id: rag-index-chunks
+title: Index the chunks
+order: 1
+instructions:
+  - Split document on blank lines and drop empty parts.
+  - Add those chunks to the index.
+  - Return the index.
+starterCode: |
+  from retrieval import Index
+
+  def index_document(document: str):
+      index = Index()
+      return index
+hints:
+  - split("\n\n") makes the chunks. strip each part before add.
+runtime: python

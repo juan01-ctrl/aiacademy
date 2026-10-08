@@ -1,0 +1,54 @@
+
+ RUN  v3.2.7 /Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web
+
+ ❯ src/lib/course-certificates.test.ts (23 tests | 3 failed) 11ms
+   ✓ per-course certificate storage > normalizes legacy credentials without changing history or progress 1ms
+   ✓ per-course certificate storage > saves B preserving A and every progress field, then finds both publicly 0ms
+   ✓ per-course certificate storage > retains first issuance date and metadata on repeated saves 0ms
+   ✓ per-course certificate storage > finds legacy fallback even when a mixed record map has its own credential 0ms
+   ✓ new credential metadata > scopes openai-api-fundamentals to simulated practice 0ms
+   ✓ new credential metadata > scopes agent-foundations to simulated practice 0ms
+   ✓ new credential metadata > scopes rag-fundamentals to simulated practice 0ms
+   ✓ new credential metadata > scopes openai-agents-sdk to simulated practice 0ms
+   ✓ new credential metadata > scopes crewai-fundamentals to simulated practice 0ms
+   ✓ new credential metadata > scopes langgraph-fundamentals to simulated practice 0ms
+   ✓ new credential metadata > scopes google-adk-fundamentals to simulated practice 0ms
+   ✓ new credential metadata > scopes mcp-fundamentals to simulated practice 0ms
+   ✓ new credential metadata > does not invent skills for unknown courses 0ms
+   × new credential metadata > treats inherited key constructor as an unknown course 2ms
+     → (coursePracticeTopics[courseId] ?? []).map is not a function
+   × new credential metadata > treats inherited key __proto__ as an unknown course 0ms
+     → (coursePracticeTopics[courseId] ?? []).map is not a function
+   × new credential metadata > treats inherited key toString as an unknown course 0ms
+     → (coursePracticeTopics[courseId] ?? []).map is not a function
+   ✓ project issuance route > submits A then B and returns each actually persisted credential 5ms
+   ✓ project issuance route > does not issue for run 0ms
+   ✓ project issuance route > does not issue for failed 0ms
+   ✓ project issuance route > does not issue for locked 0ms
+   ✓ project issuance route > does not issue for unauthenticated 0ms
+   ✓ project issuance route > does not issue for exercise 0ms
+   ✓ project issuance route > does not issue when lesson prerequisites are incomplete 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/course-certificates.test.ts > new credential metadata > treats inherited key constructor as an unknown course
+ FAIL  src/lib/course-certificates.test.ts > new credential metadata > treats inherited key __proto__ as an unknown course
+ FAIL  src/lib/course-certificates.test.ts > new credential metadata > treats inherited key toString as an unknown course
+TypeError: (coursePracticeTopics[courseId] ?? []).map is not a function
+ ❯ Module.certificateMetadata ../../packages/shared/src/index.ts:32:52
+     30|   return {
+     31|     title: `${courseTitle} — Course Completion`,
+     32|     skills: (coursePracticeTopics[courseId] ?? []).map((topic) => `Sim…
+       |                                                    ^
+     33|   };
+     34| }
+ ❯ src/lib/course-certificates.test.ts:87:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 20 passed (23)
+   Start at  15:49:34
+   Duration  492ms (transform 70ms, setup 0ms, collect 128ms, tests 11ms, environment 0ms, prepare 76ms)
+

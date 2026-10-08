@@ -1,0 +1,286 @@
+
+ RUN  v3.2.7 /Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web
+
+ ✓ src/lib/auth-routes.test.ts (4 tests) 2ms
+ ✓ src/components/course/CourseProgress.test.tsx (3 tests) 6ms
+ ✓ src/app/auth/AuthPage.test.tsx (3 tests) 9ms
+ ✓ src/components/nav/Navbar.test.tsx (2 tests) 10ms
+ ✓ src/components/auth/LoginForm.test.tsx (6 tests) 10ms
+ ❯ src/components/course/CourseOverview.test.tsx (3 tests | 1 failed) 16ms
+   × CourseOverview > shows only the current course credential, never another course legacy slot 14ms
+     → expected '<main class="mx-auto max-w-4xl px-5 p…' to contain 'href="/certificate/OWN"'
+   ✓ CourseOverview > shows public course information and modules without learner-only data 1ms
+   ✓ CourseOverview > retains learner actions and progress when learner data is present 0ms
+ ✓ src/components/home/Landing.test.tsx (7 tests) 41ms
+ ❯ src/lib/course-certificates.test.ts (20 tests | 15 failed) 17ms
+   × per-course certificate storage > normalizes legacy credentials without changing history or progress 4ms
+     → expected undefined to deeply equal { 'openai-api-fundamentals': { …(6) } }
+   × per-course certificate storage > saves B preserving A and every progress field, then finds both publicly 2ms
+     → expected { enrolledCourseIds: [ …(2) ], …(7) } to match object { enrolledCourseIds: [ …(2) ], …(7) }
+   × per-course certificate storage > retains first issuance date and metadata on repeated saves 0ms
+     → expected { id: 'REPLACEMENT', …(5) } to deeply equal { id: 'HISTORICAL-A', …(5) }
+   × per-course certificate storage > finds legacy fallback even when a mixed record map has its own credential 0ms
+     → expected null to deeply equal { id: 'MAP-A', …(5) }
+   × new credential metadata > scopes openai-api-fundamentals to simulated practice 0ms
+     → certificateMetadata is not a function
+   × new credential metadata > scopes agent-foundations to simulated practice 0ms
+     → certificateMetadata is not a function
+   × new credential metadata > scopes rag-fundamentals to simulated practice 0ms
+     → certificateMetadata is not a function
+   × new credential metadata > scopes openai-agents-sdk to simulated practice 0ms
+     → certificateMetadata is not a function
+   × new credential metadata > scopes crewai-fundamentals to simulated practice 0ms
+     → certificateMetadata is not a function
+   × new credential metadata > scopes langgraph-fundamentals to simulated practice 0ms
+     → certificateMetadata is not a function
+   × new credential metadata > scopes google-adk-fundamentals to simulated practice 0ms
+     → certificateMetadata is not a function
+   × new credential metadata > scopes mcp-fundamentals to simulated practice 0ms
+     → certificateMetadata is not a function
+   × new credential metadata > does not invent skills for unknown courses 0ms
+     → certificateMetadata is not a function
+   × project issuance route > submits A then B and returns each actually persisted credential 4ms
+     → .toMatch() expects to receive a string, but got undefined
+   × project issuance route > does not issue for run 1ms
+     → expected { id: 'AI-B08FD8', …(5) } to be null
+   ✓ project issuance route > does not issue for failed 2ms
+   ✓ project issuance route > does not issue for locked 1ms
+   ✓ project issuance route > does not issue for unauthenticated 0ms
+   ✓ project issuance route > does not issue for exercise 0ms
+   ✓ project issuance route > does not issue when lesson prerequisites are incomplete 0ms
+ ✓ src/lib/course-completion.test.ts (2 tests) 1ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/workspace/workspace-navigation.test.ts [ src/components/workspace/workspace-navigation.test.ts ]
+Error: Cannot find module './workspace-navigation' imported from '/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/components/workspace/workspace-navigation.test.ts'
+ ❯ src/components/workspace/workspace-navigation.test.ts:2:1
+      1| import { describe, expect, it } from "vitest";
+      2| import { submissionNavigation } from "./workspace-navigation";
+       | ^
+      3| 
+      4| describe("explicit Continue destination", () => {
+
+Caused by: Error: Failed to load url ./workspace-navigation (resolved id: ./workspace-navigation) in /Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/web/src/components/workspace/workspace-navigation.test.ts. Does the file exist?
+ ❯ loadAndTransform ../../../../AI%20Projects/ai-engineering-academy/node_modules/.pnpm/vite@7.3.6_@types+node@22.20.4_jiti@2.7.0_lightningcss@1.32.0_tsx@4.23.15_yaml@2.9.1/node_modules/vite/dist/node/chunks/config.js:22739:33
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/17]⎯
+
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 16 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/course-certificates.test.ts > per-course certificate storage > normalizes legacy credentials without changing history or progress
+AssertionError: expected undefined to deeply equal { 'openai-api-fundamentals': { …(6) } }
+
+- Expected: 
+{
+  "openai-api-fundamentals": {
+    "courseId": "openai-api-fundamentals",
+    "holderName": "Original Holder",
+    "id": "HISTORICAL-A",
+    "issuedAt": "2020-01-01",
+    "skills": [
+      "Original Skill",
+    ],
+    "title": "Original Title",
+  },
+}
+
++ Received: 
+undefined
+
+ ❯ src/lib/course-certificates.test.ts:44:44
+     42|     const learner = await getLearner("synthetic");
+     43|     expect(learner).toMatchObject(original);
+     44|     expect(learner.certificatesByCourseId).toEqual({ "openai-api-funda…
+       |                                            ^
+     45|   });
+     46|   it("saves B preserving A and every progress field, then finds both p…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/17]⎯
+
+ FAIL  src/lib/course-certificates.test.ts > per-course certificate storage > saves B preserving A and every progress field, then finds both publicly
+AssertionError: expected { enrolledCourseIds: [ …(2) ], …(7) } to match object { enrolledCourseIds: [ …(2) ], …(7) }
+
+- Expected
++ Received
+
+@@ -11,13 +11,13 @@
+        "id": "old",
+        "status": "passed",
+      },
+    ],
+    "certificate": {
+-     "courseId": "openai-api-fundamentals",
++     "courseId": "agent-foundations",
+      "holderName": "Original Holder",
+-     "id": "HISTORICAL-A",
++     "id": "B",
+      "issuedAt": "2020-01-01",
+      "skills": [
+        "Original Skill",
+      ],
+      "title": "Original Title",
+
+ ❯ src/lib/course-certificates.test.ts:50:19
+     48|     io.text = JSON.stringify({ learners: { synthetic: original } });
+     49|     const saved = await saveCertificate("synthetic", b);
+     50|     expect(saved).toMatchObject(original);
+       |                   ^
+     51|     expect(saved.certificatesByCourseId).toEqual({ "openai-api-fundame…
+     52|     expect(await findCertificate("HISTORICAL-A")).toEqual(a);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/17]⎯
+
+ FAIL  src/lib/course-certificates.test.ts > per-course certificate storage > retains first issuance date and metadata on repeated saves
+AssertionError: expected { id: 'REPLACEMENT', …(5) } to deeply equal { id: 'HISTORICAL-A', …(5) }
+
+- Expected
++ Received
+
+  {
+    "courseId": "openai-api-fundamentals",
+-   "holderName": "Original Holder",
+-   "id": "HISTORICAL-A",
+-   "issuedAt": "2020-01-01",
+-   "skills": [
+-     "Original Skill",
+-   ],
+-   "title": "Original Title",
++   "holderName": "Changed",
++   "id": "REPLACEMENT",
++   "issuedAt": "2099",
++   "skills": [],
++   "title": "Changed",
+  }
+
+ ❯ src/lib/course-certificates.test.ts:58:31
+     56|     await saveCertificate("synthetic", a);
+     57|     const saved = await saveCertificate("synthetic", { ...a, id: "REPL…
+     58|     expect(saved.certificate).toEqual(a);
+       |                               ^
+     59|     expect(saved.certificatesByCourseId[a.courseId]).toEqual(a);
+     60|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/17]⎯
+
+ FAIL  src/lib/course-certificates.test.ts > per-course certificate storage > finds legacy fallback even when a mixed record map has its own credential
+AssertionError: expected null to deeply equal { id: 'MAP-A', …(5) }
+
+- Expected: 
+{
+  "courseId": "openai-api-fundamentals",
+  "holderName": "Original Holder",
+  "id": "MAP-A",
+  "issuedAt": "2020-01-01",
+  "skills": [
+    "Original Skill",
+  ],
+  "title": "Original Title",
+}
+
++ Received: 
+null
+
+ ❯ src/lib/course-certificates.test.ts:64:44
+     62|     io.text = JSON.stringify({ learners: { synthetic: { ...seed(a), ce…
+     63|     expect(await findCertificate("HISTORICAL-A")).toEqual(a);
+     64|     expect(await findCertificate("MAP-A")).toEqual({ ...a, id: "MAP-A"…
+       |                                            ^
+     65|     expect(await findCertificate("B")).toEqual(b);
+     66|     expect(await findCertificate("missing")).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/17]⎯
+
+ FAIL  src/lib/course-certificates.test.ts > new credential metadata > scopes openai-api-fundamentals to simulated practice
+ FAIL  src/lib/course-certificates.test.ts > new credential metadata > scopes agent-foundations to simulated practice
+ FAIL  src/lib/course-certificates.test.ts > new credential metadata > scopes rag-fundamentals to simulated practice
+ FAIL  src/lib/course-certificates.test.ts > new credential metadata > scopes openai-agents-sdk to simulated practice
+ FAIL  src/lib/course-certificates.test.ts > new credential metadata > scopes crewai-fundamentals to simulated practice
+ FAIL  src/lib/course-certificates.test.ts > new credential metadata > scopes langgraph-fundamentals to simulated practice
+ FAIL  src/lib/course-certificates.test.ts > new credential metadata > scopes google-adk-fundamentals to simulated practice
+ FAIL  src/lib/course-certificates.test.ts > new credential metadata > scopes mcp-fundamentals to simulated practice
+TypeError: certificateMetadata is not a function
+ ❯ src/lib/course-certificates.test.ts:77:22
+     75|     ["google-adk-fundamentals", "Agent, tool, and sequence configurati…
+     76|   ])("scopes %s to simulated practice", (id, topic) => {
+     77|     const metadata = certificateMetadata(id, "Course Title");
+       |                      ^
+     78|     expect(metadata.title).toBe("Course Title — Course Completion");
+     79|     expect(metadata.skills.join(" ")).toContain(topic);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/17]⎯
+
+ FAIL  src/lib/course-certificates.test.ts > new credential metadata > does not invent skills for unknown courses
+TypeError: certificateMetadata is not a function
+ ❯ src/lib/course-certificates.test.ts:84:12
+     82|   });
+     83|   it("does not invent skills for unknown courses", () => {
+     84|     expect(certificateMetadata("unknown", "Unknown")).toEqual({ title:…
+       |            ^
+     85|   });
+     86| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/17]⎯
+
+ FAIL  src/lib/course-certificates.test.ts > project issuance route > submits A then B and returns each actually persisted credential
+TypeError: .toMatch() expects to receive a string, but got undefined
+ ❯ src/lib/course-certificates.test.ts:92:35
+     90|     const first = await (await execute("openai-api-fundamentals-projec…
+     91|     const second = await (await execute("agent-foundations-project")).…
+     92|     expect(first.certificateHref).toMatch(/^\/certificate\/AI-/);
+       |                                   ^
+     93|     expect(second.certificateHref).toMatch(/^\/certificate\/AI-/);
+     94|     expect(second.certificateHref).not.toBe(first.certificateHref);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/17]⎯
+
+ FAIL  src/lib/course-certificates.test.ts > project issuance route > does not issue for run
+AssertionError: expected { id: 'AI-B08FD8', …(5) } to be null
+
+- Expected: 
+null
+
++ Received: 
+{
+  "courseId": "openai-api-fundamentals",
+  "holderName": "Synthetic Learner",
+  "id": "AI-B08FD8",
+  "issuedAt": "2026-10-07T18:48:16.473Z",
+  "skills": [
+    "Responses API",
+    "output_text",
+    "instructions vs input",
+    "blank-prompt guard",
+    "API error handling",
+  ],
+  "title": "Certified Applied AI Engineer",
+}
+
+ ❯ src/lib/course-certificates.test.ts:109:57
+    107|     const body = await response.json();
+    108|     expect(body.certificateHref ?? null).toBeNull();
+    109|     expect((await getLearner("synthetic")).certificate).toBeNull();
+       |                                                         ^
+    110|     if (reason === "locked") expect(response.status).toBe(403);
+    111|     if (reason === "unauthenticated") expect(response.status).toBe(401…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/17]⎯
+
+ FAIL  src/components/course/CourseOverview.test.tsx > CourseOverview > shows only the current course credential, never another course legacy slot
+AssertionError: expected '<main class="mx-auto max-w-4xl px-5 p…' to contain 'href="/certificate/OWN"'
+
+Expected: "href="/certificate/OWN""
+Received: "<main class="mx-auto max-w-4xl px-5 py-10 sm:px-8 sm:py-14"><p class="text-sm text-muted"><a class="underline-offset-4 hover:underline" href="/catalog">Catalog</a><span aria-hidden="true"> / </span>Course</p><div class="mt-6 rounded-2xl border border-line bg-white p-6 shadow-sm sm:p-9"><p class="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-primary">Basic <span aria-hidden="true">·</span> 1 hr</p><h1 class="mt-3 text-3xl font-semibold tracking-tight text-navy sm:text-4xl">Sample Course</h1><p class="mt-4 max-w-2xl leading-7 text-navy/80">A course summary.</p><div class="mt-7 flex flex-wrap items-center gap-3"><button type="button" class="btn btn-primary w-fit">Enroll and start</button><span class="text-sm text-muted">1 modules · 1 hr</span></div></div><section aria-labelledby="course-modules-title" class="mt-10"><div class="flex flex-wrap items-end justify-between gap-3 border-b border-line pb-4"><div><p class="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-primary">Course outline</p><h2 id="course-modules-title" class="mt-1 text-2xl font-semibold tracking-tight">Explore the modules</h2></div><p class="text-sm text-muted">Preview the learning path before enrolling</p></div><ol class="mt-4 divide-y divide-line rounded-xl border border-line bg-white"><li class="flex items-start gap-4 px-4 py-4 sm:px-5"><span aria-hidden="true" class="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full bg-soft font-mono text-xs font-semibold text-primary">01</span><div class="min-w-0 flex-1"><h3 class="font-semibold text-navy">First module</h3><p class="mt-1 text-sm text-muted">20 min</p></div><span aria-hidden="true" class="mt-2 text-muted">›</span></li></ol></section><section aria-label="Your course progress" class="mt-8 grid gap-3 rounded-xl border border-line bg-white p-5 text-sm sm:p-6"><p>Finish every chapter to unlock the assessment.</p><p>Pass the assessment to unlock the project.</p><a class="w-fit font-semibold text-navy underline" href="/certificate/OTHER">Certificate OTHER</a></section></main>"
+
+ ❯ src/components/course/CourseOverview.test.tsx:23:17
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/17]⎯
+
+
+ Test Files  3 failed | 7 passed (10)
+      Tests  16 failed | 34 passed (50)
+   Start at  15:48:15
+   Duration  633ms (transform 535ms, setup 0ms, collect 1.54s, tests 112ms, environment 1ms, prepare 864ms)
+

@@ -1,0 +1,30 @@
+id: no-hit
+title: No hit means no citation
+summary: An empty search is a result. There is no passage to put in the prompt and no source to cite.
+durationMinutes: 14
+steps:
+  - id: rag-empty-is-a-result
+    type: explanation
+    title: Empty is a result
+    body:
+      - "Search can return an empty list. That is not an exception. It means the index has no passage for this question."
+      - "Without a passage, the model would answer from training. That answer can sound right and still be ungrounded. Do not invent a source to fill the gap."
+      - "If hits is empty, return an empty string. There is nothing to cite."
+    takeaway: If hits is empty, return an empty string.
+    example: |
+      hits = index.search(query)
+      if not hits:
+          return ""
+  - id: rag-k-is-not-truth
+    type: explanation
+    title: k is not more truth
+    body:
+      - "k is how many hits you asked for. It is a budget. A larger k gives the model more context and more chances to follow the wrong passage."
+      - "You still search. Skipping the call and pretending the document was empty is a different bug."
+    takeaway: Search, then handle the empty list.
+    example: |
+      hits = index.search(query, k=2)
+      return hits[0]["source"] if hits else ""
+  - id: rag-practice-empty
+    type: exercise
+    exerciseId: rag-empty

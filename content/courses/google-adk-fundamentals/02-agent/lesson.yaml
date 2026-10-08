@@ -1,0 +1,31 @@
+id: build-researcher
+title: Build the researcher
+summary: Pass the four arguments from the home-page example. The tool goes in the list.
+durationMinutes: 14
+steps:
+  - id: adk-four
+    type: explanation
+    title: Four arguments
+    body:
+      - "name is researcher. model is gemini-flash-latest. instruction says the agent helps users research topics thoroughly."
+      - "tools is a list. google_search is the one tool in the example. Leaving the list empty means the agent cannot search."
+    takeaway: Name, model, instruction, tools.
+    example: |
+      Agent(
+          name="researcher",
+          model="gemini-flash-latest",
+          instruction="You help users research topics thoroughly.",
+          tools=[google_search],
+      )
+  - id: adk-not-a-call
+    type: explanation
+    title: Construction is not a run
+    body:
+      - "Creating the Agent records the worker. It does not search yet."
+      - "This exercise checks the declaration. The run comes after the agent exists."
+    takeaway: Return the Agent you constructed.
+    example: |
+      return agent
+  - id: adk-practice
+    type: exercise
+    exerciseId: adk-build

@@ -1,0 +1,5 @@
+id: first-agent
+title: The first agent
+durationMinutes: 20
+lessonIds:
+  - build-and-run

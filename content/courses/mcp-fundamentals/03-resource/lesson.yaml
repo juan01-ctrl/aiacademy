@@ -1,0 +1,28 @@
+id: expose-notes
+title: Expose a resource
+summary: A tool does an action. A resource is data the client can read, such as a handbook.
+durationMinutes: 14
+steps:
+  - id: mcp-resource-idea
+    type: explanation
+    title: Resource
+    body:
+      - "MCP can expose data as well as tools. A tool is something the model asks to run. A resource is a document the client can read, such as a handbook."
+      - "resource takes a URI. notes://handbook is the address. The function name is what your code calls to read it."
+    takeaway: Register read_notes at notes://handbook.
+    example: |
+      @mcp.resource("notes://handbook")
+      def read_notes() -> str:
+          return "Paris is the capital."
+  - id: mcp-both
+    type: explanation
+    title: Server, tool, and resource
+    body:
+      - "The weather server can expose get_weather and also the notes. A client then has an action and a document."
+      - "The URI is not a file path in this exercise. It is the name the client uses to ask for the document."
+    takeaway: Decorate read_notes with the handbook URI.
+    example: |
+      mcp = FastMCP("weather")
+  - id: mcp-practice-resource
+    type: exercise
+    exerciseId: mcp-resource

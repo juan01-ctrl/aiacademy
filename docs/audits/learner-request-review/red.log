@@ -1,0 +1,296 @@
+
+ RUN  v3.2.7 /Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy
+
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx (30 tests | 26 failed) 24ms
+   × Workspace > blocks same-tick duplicate calls and exposes disabled pending control 3ms
+     → expected "spy" to be called 1 times, but got 2 times
+   × Workspace > recovers from network without success effects and clears error on retry 1ms
+     → promise rejected "Error: offline" instead of resolving
+   × Workspace > recovers from non-JSON without success effects and clears error on retry 2ms
+     → promise rejected "SyntaxError: Unexpected token '<', "<html…" instead of resolving
+   × Workspace > recovers from malformed without success effects and clears error on retry 1ms
+     → promise rejected "TypeError: Cannot read properties of unde…" instead of resolving
+   × Workspace > recovers from null without success effects and clears error on retry 0ms
+     → promise rejected "TypeError: Cannot read properties of null…" instead of resolving
+   × Workspace > recovers from HTTP authentication without success effects and clears error on retry 5ms
+     → expected '<section class="grid h-full lg:grid-c…' to contain 'role="alert"'
+   × Workspace > rejects unsuccessful HTTP even with a successful-looking acknowledgment 1ms
+     → expected '<section class="grid h-full lg:grid-c…' to contain 'role="alert"'
+   × Explanation > blocks same-tick duplicate calls and exposes disabled pending control 0ms
+     → expected "spy" to be called 1 times, but got 2 times
+   × Explanation > recovers from network without success effects and clears error on retry 0ms
+     → promise rejected "Error: offline" instead of resolving
+   × Explanation > recovers from non-JSON without success effects and clears error on retry 1ms
+     → expected '<section class="grid h-full lg:grid-c…' to contain 'role="alert"'
+   × Explanation > recovers from malformed without success effects and clears error on retry 1ms
+     → expected '<section class="grid h-full lg:grid-c…' to contain 'role="alert"'
+   × Explanation > recovers from null without success effects and clears error on retry 1ms
+     → expected '<section class="grid h-full lg:grid-c…' to contain 'role="alert"'
+   × Explanation > recovers from HTTP authentication without success effects and clears error on retry 1ms
+     → expected '<section class="grid h-full lg:grid-c…' to contain 'Sign in required.'
+   ✓ Explanation > rejects unsuccessful HTTP even with a successful-looking acknowledgment 1ms
+   × Enrollment > blocks same-tick duplicate calls and exposes disabled pending control 0ms
+     → expected "spy" to be called 1 times, but got 2 times
+   × Enrollment > recovers from network without success effects and clears error on retry 0ms
+     → promise rejected "Error: offline" instead of resolving
+   × Enrollment > recovers from non-JSON without success effects and clears error on retry 0ms
+     → expected '<button type="button" class="btn btn-…' to contain 'role="alert"'
+   × Enrollment > recovers from malformed without success effects and clears error on retry 0ms
+     → expected '<button type="button" class="btn btn-…' to contain 'role="alert"'
+   × Enrollment > recovers from null without success effects and clears error on retry 0ms
+     → expected '<button type="button" class="btn btn-…' to contain 'role="alert"'
+   × Enrollment > recovers from HTTP authentication without success effects and clears error on retry 0ms
+     → expected '<button type="button" class="btn btn-…' to contain 'role="alert"'
+   × Enrollment > rejects unsuccessful HTTP even with a successful-looking acknowledgment 0ms
+     → expected '<button type="button" class="btn btn-…' to contain 'role="alert"'
+   × Workspace result and navigation protocol > rejects invalid result {"status":"unknown","stdout":"output","stderr":"","truncated":false,"feedback":[]} without changing navigation 1ms
+     → expected '<section class="grid h-full lg:grid-c…' to contain 'role="alert"'
+   × Workspace result and navigation protocol > rejects invalid result {"status":"passed","stdout":4,"stderr":"","truncated":false,"feedback":[]} without changing navigation 1ms
+     → expected '<section class="grid h-full lg:grid-c…' to contain 'role="alert"'
+   × Workspace result and navigation protocol > rejects invalid result {"status":"passed","stdout":"output","stderr":"","truncated":false,"feedback":[{"message":"missing concept"}]} without changing navigation 1ms
+     → expected '<section class="grid h-full lg:grid-c…' to contain 'role="alert"'
+   × Workspace result and navigation protocol > rejects invalid result {"status":"passed","stdout":"output","stderr":"","truncated":false,"feedback":[],"hiddenTests":[]} without changing navigation 0ms
+     → expected '<section class="grid h-full lg:grid-c…' to contain 'role="alert"'
+   × Workspace result and navigation protocol > rejects malformed certificate navigation before committing result 1ms
+     → expected '<section class="grid h-full lg:grid-c…' to contain 'role="alert"'
+   × Workspace result and navigation protocol > shows request errors on historically passed exercises without losing Continue 1ms
+     → expected '<section class="grid h-full lg:grid-c…' to contain 'role="alert"'
+   ✓ Workspace result and navigation protocol > Run never completes or changes destination but passed Submit uses returned credential 1ms
+   ✓ Workspace result and navigation protocol > passed-but-uncertified projects can submit again and recover a credential 0ms
+   ✓ Workspace result and navigation protocol > keeps grading failures distinct from request alerts 0ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 26 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Workspace > blocks same-tick duplicate calls and exposes disabled pending control
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Explanation > blocks same-tick duplicate calls and exposes disabled pending control
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Enrollment > blocks same-tick duplicate calls and exposes disabled pending control
+AssertionError: expected "spy" to be called 1 times, but got 2 times
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx:55:21
+     53|       const request = deferred(); const fetch = vi.fn(() => request.pr…
+     54|       const control = button(render(component), label); const first = …
+     55|       expect(fetch).toHaveBeenCalledTimes(1);
+       |                     ^
+     56|       expect(button(render(component), pendingLabel).props.disabled).t…
+     57|       request.resolve(response(ack)); await Promise.all([first, duplic…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/26]⎯
+
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Workspace > recovers from network without success effects and clears error on retry
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Explanation > recovers from network without success effects and clears error on retry
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Enrollment > recovers from network without success effects and clears error on retry
+AssertionError: promise rejected "Error: offline" instead of resolving
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx:68:61
+     66|       it(`recovers from ${failure} without success effects and clears …
+     67|         const fetch = vi.fn(transport); vi.stubGlobal("fetch", fetch);
+     68|         await expect(click(button(render(component), label))).resolves…
+       |                                                             ^
+     69|         let tree = render(component); const html = renderToStaticMarku…
+     70|         expect(html).toContain('role="alert"');
+
+Caused by: Error: offline
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx:60:40
+ ❯ execute apps/web/src/components/workspace/Workspace.tsx:33:28
+ ❯ Object.onClick apps/web/src/components/workspace/Workspace.tsx:96:106
+ ❯ click apps/web/src/components/workspace/learner-requests.test.tsx:36:82
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx:68:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/26]⎯
+
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Workspace > recovers from non-JSON without success effects and clears error on retry
+AssertionError: promise rejected "SyntaxError: Unexpected token '<', "<html…" instead of resolving
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx:68:61
+     66|       it(`recovers from ${failure} without success effects and clears …
+     67|         const fetch = vi.fn(transport); vi.stubGlobal("fetch", fetch);
+     68|         await expect(click(button(render(component), label))).resolves…
+       |                                                             ^
+     69|         let tree = render(component); const html = renderToStaticMarku…
+     70|         expect(html).toContain('role="alert"');
+
+Caused by: SyntaxError: Unexpected token '<', "<html>oops</html>" is not valid JSON
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/26]⎯
+
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Workspace > recovers from malformed without success effects and clears error on retry
+AssertionError: promise rejected "TypeError: Cannot read properties of unde…" instead of resolving
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx:68:61
+     66|       it(`recovers from ${failure} without success effects and clears …
+     67|         const fetch = vi.fn(transport); vi.stubGlobal("fetch", fetch);
+     68|         await expect(click(button(render(component), label))).resolves…
+       |                                                             ^
+     69|         let tree = render(component); const html = renderToStaticMarku…
+     70|         expect(html).toContain('role="alert"');
+
+Caused by: TypeError: Cannot read properties of undefined (reading 'status')
+ ❯ submissionNavigation apps/web/src/components/workspace/workspace-navigation.ts:5:40
+ ❯ apps/web/src/components/workspace/Workspace.tsx:45:32
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx:16:108
+ ❯ execute apps/web/src/components/workspace/Workspace.tsx:45:5
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx:68:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/26]⎯
+
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Workspace > recovers from null without success effects and clears error on retry
+AssertionError: promise rejected "TypeError: Cannot read properties of null…" instead of resolving
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx:68:61
+     66|       it(`recovers from ${failure} without success effects and clears …
+     67|         const fetch = vi.fn(transport); vi.stubGlobal("fetch", fetch);
+     68|         await expect(click(button(render(component), label))).resolves…
+       |                                                             ^
+     69|         let tree = render(component); const html = renderToStaticMarku…
+     70|         expect(html).toContain('role="alert"');
+
+Caused by: TypeError: Cannot read properties of null (reading 'result')
+ ❯ execute apps/web/src/components/workspace/Workspace.tsx:44:20
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx:68:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/26]⎯
+
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Workspace > recovers from HTTP authentication without success effects and clears error on retry
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Explanation > recovers from non-JSON without success effects and clears error on retry
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Explanation > recovers from malformed without success effects and clears error on retry
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Explanation > recovers from null without success effects and clears error on retry
+AssertionError: expected '<section class="grid h-full lg:grid-c…' to contain 'role="alert"'
+
+- Expected
++ Received
+
+- role="alert"
++ <section class="grid h-full lg:grid-cols-2"><div class="overflow-auto bg-white px-8 py-8"><p class="text-xs font-semibold tracking-wide text-muted uppercase">Exercise · 100 XP</p><h1 class="mt-2 text-2xl font-semibold">Practice</h1><ol class="mt-4 grid list-decimal gap-2 pl-5 text-[15px] leading-7"></ol><button type="button" class="btn btn-ghost mt-5 px-0 underline">Take hint</button><div role="status" class="mt-6 rounded-md border border-incorrect/30 bg-incorrect/5 px-4 py-3 text-sm"><p class="font-semibold text-incorrect">Could not grade</p><p class="mt-1 font-mono text-xs">Sign in required.</p></div></div><div class="grid min-h-0 grid-rows-[auto_1fr_auto_auto] bg-editor text-white"><p class="border-b border-white/10 px-4 py-2 font-mono text-xs">script.py</p><pre class="max-h-36 overflow-auto border-t border-white/10 px-4 py-3 font-mono text-xs" aria-live="polite"><span class="mb-1 block text-white/50">Console</span>
++ Sign in required.</pre><div class="flex flex-wrap items-center gap-2 border-t border-white/10 bg-white px-4 py-3 text-navy"><button type="button" class="btn btn-ghost">Reset</button><button type="button" class="btn btn-secondary ml-auto">Run code</button><button type="button" class="btn btn-primary">Submit answer</button></div></div></section>
+
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx:70:22
+     68|         await expect(click(button(render(component), label))).resolves…
+     69|         let tree = render(component); const html = renderToStaticMarku…
+     70|         expect(html).toContain('role="alert"');
+       |                      ^
+     71|         if (failure === "HTTP authentication") expect(html).toContain(…
+     72|         expect(button(tree, label).props.disabled).toBeFalsy();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/26]⎯
+
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Workspace > rejects unsuccessful HTTP even with a successful-looking acknowledgment
+AssertionError: expected '<section class="grid h-full lg:grid-c…' to contain 'role="alert"'
+
+- Expected
++ Received
+
+- role="alert"
++ <section class="grid h-full lg:grid-cols-2"><div class="overflow-auto bg-white px-8 py-8"><p class="text-xs font-semibold tracking-wide text-muted uppercase">Exercise · 100 XP</p><h1 class="mt-2 text-2xl font-semibold">Practice</h1><ol class="mt-4 grid list-decimal gap-2 pl-5 text-[15px] leading-7"></ol><button type="button" class="btn btn-ghost mt-5 px-0 underline">Take hint</button><div role="status" class="mt-6 rounded-md border border-incorrect/30 bg-incorrect/5 px-4 py-3 text-sm"><p class="font-semibold text-incorrect">Could not grade</p><p class="mt-1 font-mono text-xs">Request failed.</p></div></div><div class="grid min-h-0 grid-rows-[auto_1fr_auto_auto] bg-editor text-white"><p class="border-b border-white/10 px-4 py-2 font-mono text-xs">script.py</p><pre class="max-h-36 overflow-auto border-t border-white/10 px-4 py-3 font-mono text-xs" aria-live="polite"><span class="mb-1 block text-white/50">Console</span>
++ Request failed.</pre><div class="flex flex-wrap items-center gap-2 border-t border-white/10 bg-white px-4 py-3 text-navy"><button type="button" class="btn btn-ghost">Reset</button><button type="button" class="btn btn-secondary ml-auto">Run code</button><button type="button" class="btn btn-primary">Submit answer</button></div></div></section>
+
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx:87:55
+     85|       vi.stubGlobal("fetch", vi.fn(async () => response(ack, 500)));
+     86|       await click(button(render(component), label));
+     87|       expect(renderToStaticMarkup(render(component))).toContain('role=…
+       |                                                       ^
+     88|       expect(window.location.href).toBe("/current"); expect(window.loc…
+     89|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/26]⎯
+
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Explanation > recovers from HTTP authentication without success effects and clears error on retry
+AssertionError: expected '<section class="grid h-full lg:grid-c…' to contain 'Sign in required.'
+
+Expected: "Sign in required."
+Received: "<section class="grid h-full lg:grid-cols-2"><div class="overflow-auto bg-white px-8 py-8"><p class="text-xs font-semibold tracking-wide text-primary uppercase">Theory · 4 min</p><h1 class="mt-2 text-2xl font-semibold">Intro</h1><div class="mt-5 grid gap-4 text-[16px] leading-8 text-navy/90"></div><aside class="mt-6 border-l-4 border-mark bg-[#fbf6ea] px-4 py-3"><p class="text-xs font-semibold tracking-wide text-mark uppercase">Key idea</p><p class="mt-1 text-sm leading-6"><span>idea</span></p></aside><p role="alert" class="mt-3 text-sm text-incorrect">Finish the previous step first.</p></div><div class="grid grid-rows-[1fr_auto] bg-editor text-white"><div class="overflow-auto px-6 py-6"><p class="text-xs font-semibold tracking-wide text-white/50 uppercase">Example</p><pre class="mt-4 font-mono text-sm leading-7">code</pre></div><div class="flex items-center justify-between border-t border-white/10 bg-white px-4 py-3 text-navy"><span></span><button type="button" class="btn btn-primary">Continue</button></div></div></section>"
+
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx:71:61
+     69|         let tree = render(component); const html = renderToStaticMarku…
+     70|         expect(html).toContain('role="alert"');
+     71|         if (failure === "HTTP authentication") expect(html).toContain(…
+       |                                                             ^
+     72|         expect(button(tree, label).props.disabled).toBeFalsy();
+     73|         expect(window.location.href).toBe("/current"); expect(window.l…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/26]⎯
+
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Enrollment > recovers from non-JSON without success effects and clears error on retry
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Enrollment > recovers from malformed without success effects and clears error on retry
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Enrollment > recovers from null without success effects and clears error on retry
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Enrollment > recovers from HTTP authentication without success effects and clears error on retry
+AssertionError: expected '<button type="button" class="btn btn-…' to contain 'role="alert"'
+
+Expected: "role="alert""
+Received: "<button type="button" class="btn btn-primary w-fit">Enroll and start</button>"
+
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx:70:22
+     68|         await expect(click(button(render(component), label))).resolves…
+     69|         let tree = render(component); const html = renderToStaticMarku…
+     70|         expect(html).toContain('role="alert"');
+       |                      ^
+     71|         if (failure === "HTTP authentication") expect(html).toContain(…
+     72|         expect(button(tree, label).props.disabled).toBeFalsy();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/26]⎯
+
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Enrollment > rejects unsuccessful HTTP even with a successful-looking acknowledgment
+AssertionError: expected '<button type="button" class="btn btn-…' to contain 'role="alert"'
+
+Expected: "role="alert""
+Received: "<button type="button" class="btn btn-primary w-fit">Enroll and start</button>"
+
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx:87:55
+     85|       vi.stubGlobal("fetch", vi.fn(async () => response(ack, 500)));
+     86|       await click(button(render(component), label));
+     87|       expect(renderToStaticMarkup(render(component))).toContain('role=…
+       |                                                       ^
+     88|       expect(window.location.href).toBe("/current"); expect(window.loc…
+     89|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/26]⎯
+
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Workspace result and navigation protocol > rejects invalid result {"status":"unknown","stdout":"output","stderr":"","truncated":false,"feedback":[]} without changing navigation
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Workspace result and navigation protocol > rejects invalid result {"status":"passed","stdout":4,"stderr":"","truncated":false,"feedback":[]} without changing navigation
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Workspace result and navigation protocol > rejects invalid result {"status":"passed","stdout":"output","stderr":"","truncated":false,"feedback":[{"message":"missing concept"}]} without changing navigation
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Workspace result and navigation protocol > rejects invalid result {"status":"passed","stdout":"output","stderr":"","truncated":false,"feedback":[],"hiddenTests":[]} without changing navigation
+AssertionError: expected '<section class="grid h-full lg:grid-c…' to contain 'role="alert"'
+
+Expected: "role="alert""
+Received: "<section class="grid h-full lg:grid-cols-2"><div class="overflow-auto bg-white px-8 py-8"><p class="text-xs font-semibold tracking-wide text-muted uppercase">Exercise · 100 XP</p><h1 class="mt-2 text-2xl font-semibold">Practice</h1><ol class="mt-4 grid list-decimal gap-2 pl-5 text-[15px] leading-7"></ol><button type="button" class="btn btn-ghost mt-5 px-0 underline">Take hint</button><div role="status" class="mt-6 rounded-md border border-incorrect/30 bg-incorrect/5 px-4 py-3 text-sm"><p class="font-semibold text-incorrect">Could not grade</p></div></div><div class="grid min-h-0 grid-rows-[auto_1fr_auto_auto] bg-editor text-white"><p class="border-b border-white/10 px-4 py-2 font-mono text-xs">script.py</p><pre class="max-h-36 overflow-auto border-t border-white/10 px-4 py-3 font-mono text-xs" aria-live="polite"><span class="mb-1 block text-white/50">Console</span>output</pre><div class="flex flex-wrap items-center gap-2 border-t border-white/10 bg-white px-4 py-3 text-navy"><button type="button" class="btn btn-ghost">Reset</button><button type="button" class="btn btn-secondary ml-auto">Run code</button><button type="button" class="btn btn-primary">Submit answer</button></div></div></section>"
+
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx:97:74
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/26]⎯
+
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Workspace result and navigation protocol > rejects malformed certificate navigation before committing result
+AssertionError: expected '<section class="grid h-full lg:grid-c…' to contain 'role="alert"'
+
+Expected: "role="alert""
+Received: "<section class="grid h-full lg:grid-cols-2"><div class="overflow-auto bg-white px-8 py-8"><p class="text-xs font-semibold tracking-wide text-muted uppercase">Exercise · 100 XP</p><h1 class="mt-2 text-2xl font-semibold">Practice</h1><ol class="mt-4 grid list-decimal gap-2 pl-5 text-[15px] leading-7"></ol><button type="button" class="btn btn-ghost mt-5 px-0 underline">Take hint</button><p role="status" class="mt-6 rounded-md bg-pass/15 px-4 py-3 text-sm font-medium">Great work. Your code stays. Continue when you are ready.</p></div><div class="grid min-h-0 grid-rows-[auto_1fr_auto_auto] bg-editor text-white"><p class="border-b border-white/10 px-4 py-2 font-mono text-xs">script.py</p><pre class="max-h-36 overflow-auto border-t border-white/10 px-4 py-3 font-mono text-xs" aria-live="polite"><span class="mb-1 block text-white/50">Console</span>output</pre><div class="flex flex-wrap items-center gap-2 border-t border-white/10 bg-white px-4 py-3 text-navy"><button type="button" class="btn btn-ghost">Reset</button><button type="button" class="btn btn-secondary ml-auto">Run code</button><a href="[object Object]" class="btn btn-primary">Continue</a></div></div></section>"
+
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx:103:53
+    101|     vi.stubGlobal("fetch", vi.fn(async () => response({ result: valid,…
+    102|     const component = workspace(); await click(button(render(component…
+    103|     expect(renderToStaticMarkup(render(component))).toContain('role="a…
+       |                                                     ^
+    104|     expect(renderToStaticMarkup(render(component))).not.toContain("out…
+    105|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/26]⎯
+
+ FAIL  apps/web/src/components/workspace/learner-requests.test.tsx > Workspace result and navigation protocol > shows request errors on historically passed exercises without losing Continue
+AssertionError: expected '<section class="grid h-full lg:grid-c…' to contain 'role="alert"'
+
+- Expected
++ Received
+
+- role="alert"
++ <section class="grid h-full lg:grid-cols-2"><div class="overflow-auto bg-white px-8 py-8"><p class="text-xs font-semibold tracking-wide text-muted uppercase">Exercise · 100 XP</p><h1 class="mt-2 text-2xl font-semibold">Practice</h1><ol class="mt-4 grid list-decimal gap-2 pl-5 text-[15px] leading-7"></ol><button type="button" class="btn btn-ghost mt-5 px-0 underline">Take hint</button><p role="status" class="mt-6 rounded-md bg-pass/15 px-4 py-3 text-sm font-medium">Great work. Your code stays. Continue when you are ready.</p></div><div class="grid min-h-0 grid-rows-[auto_1fr_auto_auto] bg-editor text-white"><p class="border-b border-white/10 px-4 py-2 font-mono text-xs">script.py</p><pre class="max-h-36 overflow-auto border-t border-white/10 px-4 py-3 font-mono text-xs" aria-live="polite"><span class="mb-1 block text-white/50">Console</span>
++ Sign in required.</pre><div class="flex flex-wrap items-center gap-2 border-t border-white/10 bg-white px-4 py-3 text-navy"><button type="button" class="btn btn-ghost">Reset</button><button type="button" class="btn btn-secondary ml-auto">Run code</button><a href="/next" class="btn btn-primary">Continue</a></div></div></section>
+
+ ❯ apps/web/src/components/workspace/learner-requests.test.tsx:109:72
+    107|     vi.stubGlobal("fetch", vi.fn(async () => response({ error: "Sign i…
+    108|     const component = workspace(true); await click(button(render(compo…
+    109|     const html = renderToStaticMarkup(render(component)); expect(html)…
+       |                                                                        ^
+    110|   });
+    111|   it("Run never completes or changes destination but passed Submit use…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/26]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  26 failed | 4 passed (30)
+   Start at  17:10:03
+   Duration  528ms (transform 62ms, setup 0ms, collect 77ms, tests 24ms, environment 0ms, prepare 96ms)
+

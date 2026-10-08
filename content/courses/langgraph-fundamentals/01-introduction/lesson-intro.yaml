@@ -1,0 +1,53 @@
+id: what-is-langgraph
+title: What is LangGraph
+summary: LangGraph is the runtime that runs stateful steps, some hand-written and some model-driven.
+durationMinutes: 16
+steps:
+  - id: lg-what-is-it
+    type: explanation
+    title: What is LangGraph
+    body:
+      - "LangGraph is a low-level orchestration framework for long-running, stateful agents. It runs a graph of steps and keeps the state between them."
+      - "A step is a node. An arrow is an edge. The shared object is the state. You can mix a hand-written step with a step that calls a model."
+      - "It does not hide the steps. A prebuilt agent does. Use LangGraph when you need to see and control each step."
+      - "The overview example is one node. START points at it. The node points at END. compile makes the graph runnable. invoke passes the first state."
+    takeaway: LangGraph runs steps that share state.
+    example: |
+      graph = StateGraph(MessagesState)
+      graph.add_node("mock_llm", mock_llm)
+      graph.add_edge(START, "mock_llm")
+      graph.add_edge("mock_llm", END)
+      graph.compile()
+  - id: lg-what-for
+    type: explanation
+    title: What is it used for
+    body:
+      - "Use it when the next step depends on what the last step wrote. A draft node writes notes. A review node reads those notes."
+      - "Use it when a run must pause for a person and resume later. That needs a checkpointer, which comes after the graph exists."
+      - "Do not use it for one prompt with no next step. That is responses.create."
+    takeaway: Use a graph when the work has more than one step.
+    example: |
+      graph.add_edge(START, "draft")
+      graph.add_edge("draft", "review")
+  - id: lg-what-you-will-learn
+    type: explanation
+    title: What you will practice here
+    body:
+      - "You will register a node, connect it from the start, route on state, and compile with a checkpointer."
+      - "You will not start with a prebuilt agent. That agent hides the nodes you are here to name."
+      - "The next lesson builds the first node."
+    takeaway: State first. Routing later. Pause last.
+    example: |
+      graph.add_node("draft", draft)
+      graph.compile()
+  - id: lg-before-the-editor
+    type: explanation
+    title: Before the editor
+    body:
+      - "A node is a function. It reads state and returns an update, such as a new notes list."
+      - "add_node only records that function. compile checks the graph and is required before invoke."
+      - "The next step registers a node named draft."
+    takeaway: Next you will register a node named draft.
+    example: |
+      def draft(state):
+          return {"notes": ["drafted"]}

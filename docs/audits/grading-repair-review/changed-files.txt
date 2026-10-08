@@ -1,0 +1,16 @@
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/src/grade-boundary.test.ts
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/src/grade.ts
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/grader.py
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/harness.py
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/manifest.json
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/mocks/agents/__init__.py
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/mocks/google/adk/__init__.py
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/mocks/langgraph/graph.py
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/mocks/openai/__init__.py
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/test_contracts.py
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/tests/adk-sequence.py
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/tests/agents-research.py
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/tests/lg-checkpointer.py
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/tests/lg-project.py
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/tests/pass-json-schema.py
+/Users/juanierace/Documents/Projects/AI Projects/ai-engineering-academy/apps/executor/grading/tests/responses-capstone.py

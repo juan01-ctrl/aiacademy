@@ -1,0 +1,27 @@
+id: sequential-process
+title: Sequential is a choice
+summary: Sequential runs tasks in list order. Hierarchical needs a manager, not a longer backstory.
+durationMinutes: 14
+steps:
+  - id: crew-order-is-the-process
+    type: explanation
+    title: Order is the process
+    body:
+      - "process tells the crew how tasks run. sequential runs them in list order. Each task can read the previous output. Use it when you already know the order."
+      - "hierarchical adds a manager that assigns work. You must pass a manager model or a manager agent. Writing you are the manager in a backstory does not switch the process."
+      - "You set process to sequential on the crew, then call kickoff. This exercise checks that argument."
+    takeaway: Pass process="sequential" when you construct the crew.
+    example: |
+      Crew(agents=[researcher], tasks=[task], process="sequential")
+  - id: crew-kickoff-still-required
+    type: explanation
+    title: Kickoff is still required
+    body:
+      - "Choosing a process does not run the crew. Construction only records the agents, the tasks, and the process."
+      - "kickoff is the call that starts the work and returns the result. Return that value."
+    takeaway: Set the process, then return kickoff().
+    example: |
+      return crew.kickoff()
+  - id: crew-practice-process
+    type: exercise
+    exerciseId: crew-sequential
