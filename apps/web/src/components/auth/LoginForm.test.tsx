@@ -53,4 +53,12 @@ describe("LoginForm", () => {
     expect(emailDivider).toBeLessThan(emailField);
     expect(html).toMatch(/class="btn btn-secondary mt-5 w-full gap-2"/);
   });
+
+  it("asks sign-up users to confirm their password", () => {
+    const html = render("sign-up");
+    expect(html).toContain('id="confirm-password"');
+    expect(html).toContain('name="confirmPassword"');
+    expect(html).toContain('autoComplete="new-password"');
+    expect(html).toContain("Confirm password");
+  });
 });

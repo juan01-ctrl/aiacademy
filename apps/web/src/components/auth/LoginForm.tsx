@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { authClient } from "@/lib/auth-client";
 import { getAuthPath, type AuthMode } from "@/lib/auth-routes";
+import { passwordsMatch } from "@/lib/password-confirmation";
 
 export function LoginForm({ nextPath, initialMode = "sign-in" }: { nextPath: string; initialMode?: AuthMode }) {
   const [error, setError] = useState("");
@@ -15,7 +16,12 @@ export function LoginForm({ nextPath, initialMode = "sign-in" }: { nextPath: str
     const form = new FormData(event.currentTarget);
     const email = String(form.get("email") ?? "");
     const password = String(form.get("password") ?? "");
+    const confirmPassword = String(form.get("confirmPassword") ?? "");
     const name = String(form.get("name") ?? "");
+    if (isSignUp && !passwordsMatch(password, confirmPassword)) {
+      setError("Passwords do not match.");
+      return;
+    }
     setPending(true);
     setError("");
     try {
@@ -90,6 +96,10 @@ export function LoginForm({ nextPath, initialMode = "sign-in" }: { nextPath: str
           <input id="password" name="password" type="password" required minLength={8} autoComplete={isSignUp ? "new-password" : "current-password"} className={fieldClass} />
           <span className="text-xs font-normal text-muted">{isSignUp ? "Use at least 8 characters." : "At least 8 characters."}</span>
         </label>
+        {isSignUp ? <label className="grid gap-1.5 text-sm font-medium text-navy" htmlFor="confirm-password">
+          Confirm password
+          <input id="confirm-password" name="confirmPassword" type="password" required autoComplete="new-password" className={fieldClass} />
+        </label> : null}
         <button type="submit" disabled={pending} className="btn btn-primary mt-1 w-full">
           {pending ? (isSignUp ? "Creating account…" : "Signing in…") : isSignUp ? "Create account" : "Sign in"}
         </button>
