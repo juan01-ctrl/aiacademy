@@ -6,7 +6,7 @@
     "dev": "node scripts/run-next.mjs dev",
     "db:migrate": "node scripts/migrate.mjs",
     "db:import-local": "node scripts/import-local-data.mjs",
-    "build": "node scripts/run-next.mjs build",
+    "build": "pnpm --filter @academy/course-engine run import && node scripts/run-next.mjs build",
     "start": "node scripts/run-next.mjs start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
