@@ -1,74 +1,41 @@
-import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
-import { timingSafeEqual } from "node:crypto";
-import { executionRequestSchema, executionResultSchema } from "@academy/contracts";
+import express from "express";
+import { executionResultSchema, exerciseIdSchema } from "@academy/contracts";
 import { executeExercise } from "./grade";
+import { isAuthorizedServiceRequest } from "./service-auth";
 
-const port = Number(process.env.EXECUTOR_PORT ?? 8787);
-const token = process.env.EXECUTOR_TOKEN ?? "dev-executor-token";
+const app = express();
+app.disable("x-powered-by");
+app.use(express.json({ limit: "60kb", strict: true }));
 
-function authorized(request: IncomingMessage): boolean {
-  const header = request.headers.authorization ?? "";
-  const expected = Buffer.from(`Bearer ${token}`);
-  const actual = Buffer.from(header);
-  if (expected.length !== actual.length) return false;
-  return timingSafeEqual(expected, actual);
-}
-
-async function readBody(request: IncomingMessage): Promise<string> {
-  const chunks: Buffer[] = [];
-  let size = 0;
-  for await (const chunk of request) {
-    const buffer = Buffer.from(chunk);
-    size += buffer.length;
-    if (size > 80_000) throw new Error("Body too large");
-    chunks.push(buffer);
-  }
-  return Buffer.concat(chunks).toString("utf8");
-}
-
-function send(response: ServerResponse, status: number, body: unknown): void {
-  response.writeHead(status, { "content-type": "application/json" });
-  response.end(JSON.stringify(body));
-}
-
-const server = createServer(async (request, response) => {
-  if (request.url === "/health") {
-    send(response, 200, { ok: true });
+app.post("/internal/execute", async (request, response) => {
+  if (!isAuthorizedServiceRequest(request.header("authorization"), process.env.EXECUTOR_SERVICE_TOKEN)) {
+    response.status(401).json({ error: "Unauthorized service request." });
     return;
   }
-  if (!authorized(request)) {
-    send(response, 401, { status: "unavailable", stdout: "", stderr: "Unauthorized.", truncated: false, feedback: [] });
+
+  const body = request.body as Record<string, unknown> | null;
+  if (!body || typeof body !== "object"
+    || !exerciseIdSchema.safeParse(body.exerciseId).success
+    || typeof body.source !== "string" || Buffer.byteLength(body.source, "utf8") > 50_000
+    || (body.mode !== "run" && body.mode !== "submit")
+    || (body.deadlineAt !== undefined && (typeof body.deadlineAt !== "number" || !Number.isFinite(body.deadlineAt)))) {
+    response.status(400).json({ error: "Invalid execution request." });
     return;
   }
-  const mode = request.url === "/v1/run" ? "run" : request.url === "/v1/submit" ? "submit" : null;
-  if (!mode || request.method !== "POST") {
-    send(response, 404, { error: "Not found" });
-    return;
-  }
+
   try {
-    const parsed = executionRequestSchema.safeParse(JSON.parse(await readBody(request)));
-    if (!parsed.success) {
-      send(response, 400, { status: "error", stdout: "", stderr: "Invalid execution request.", truncated: false, feedback: [] });
-      return;
-    }
-    const result = await executeExercise({
-      exerciseId: parsed.data.exerciseId,
-      source: parsed.data.source,
-      mode,
-    });
-    send(response, 200, executionResultSchema.parse(result));
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Executor failed";
-    send(response, 503, {
-      status: "unavailable",
-      stdout: "",
-      stderr: message,
-      truncated: false,
-      feedback: [{ concept: "Executor", message: "The execution service is unavailable. This is not a wrong answer." }],
-    });
+    const result = executionResultSchema.parse(await executeExercise({
+      exerciseId: body.exerciseId as string,
+      source: body.source,
+      mode: body.mode,
+      deadlineAt: body.deadlineAt as number | undefined,
+    }));
+    response.status(200).json(result);
+  } catch {
+    response.status(503).json({ error: "Execution service is unavailable." });
   }
 });
 
-server.listen(port, "127.0.0.1", () => {
-  console.log(`executor listening on 127.0.0.1:${port}`);
-});
+app.use((_request, response) => response.status(404).json({ error: "Not found." }));
+
+export default app;

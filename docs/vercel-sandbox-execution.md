@@ -1,0 +1,21 @@
+# Learner code execution on Vercel
+
+The Next.js `POST /api/execute` route owns authentication, course access, draft persistence, attempt recording, and certificate decisions. It calls the private Express executor service over a Vercel Service binding; the executor runs Python `Run` requests with `@vercel/sandbox`.
+
+## Security boundary and current submission limitation
+
+- Each `Run` gets a fresh Vercel Linux microVM with `networkPolicy: "deny-all"`, `persistent: false`, one vCPU, an 8-second sandbox session timeout, a 6-second command limit, and a 20-second end-to-end execution deadline (or the shorter remaining API deadline). Standard output and error are capped at 8,000 bytes each. Sandbox creation, upload, and command execution share an abort signal; stop is attempted with a 2-second cleanup bound.
+- `Run` receives the public harness and mocks only. The trusted application does not read trace/result files back from the learner VM.
+- Automated `Submit` is intentionally **disabled and fails closed**. The current Python harness executes learner code in the same process that writes trace/result files; learner code can rewrite those files and forge evidence. A second sandbox would protect hidden test source, but it cannot establish the integrity of artifacts produced by the learner-controlled process. Until an independently attested grading design exists, a submission is saved as a draft and returned as `unavailable`; it cannot pass, count as a pass, or issue a certificate. Hidden grader tests are never copied into the learner sandbox.
+- The endpoint enforces durable, shared Postgres fixed-window budgets of 3 requests per learner per minute and 60 total per minute. Reservation uses a transaction, so global capacity is rolled back if learner or global capacity is exhausted. Database errors fail closed with 503; exhausted budgets return 429.
+- The API accepts at most 80,000 bytes of JSON, source is capped at 50,000 characters by the request contract. Vercel's universal managed image includes Python 3.14.
+
+## Deployment setup
+
+1. Deploy the monorepo as one Vercel Services project (project framework **Services**) using the root `vercel.json`. `apps/web` is the public Next.js service and its final catch-all rewrite receives public paths; `apps/executor` is the private Express service and has no public rewrite. Do not deploy only `apps/web` as a single-framework project or add a rewrite targeting `executor`. Every public path, including `/api/execute`, must continue to reach the web app so its authentication, enrollment, course access, rate-limit, progress, and draft workflow remains authoritative.
+2. Apply database migrations before routing execution traffic: `pnpm --filter @academy/web db:migrate` with `DATABASE_URL_UNPOOLED` configured. This creates the durable rate-limit table.
+3. Enable Vercel Sandbox for the executor service. Production authentication uses Vercel OIDC automatically; do not add learner secrets to sandbox environment variables. Set the same strong random `EXECUTOR_SERVICE_TOKEN` in the web and executor services in each Vercel environment. The web caller sends it as a bearer token and the executor validates it before parsing or dispatching execution. Vercel injects `EXECUTOR_URL` at runtime; do not configure it manually. Service bindings do not resolve during builds or middleware.
+4. For local multi-service testing, use `vercel dev` and provide the shared token in the local environment. For local Sandbox integration runs, link the project with Vercel CLI and provide `VERCEL_OIDC_TOKEN` through Vercel's supported local workflow. Without Vercel or that token, execution fails closed. Unit tests use a mocked SDK and need no token.
+5. Vercel Sandbox pricing is usage-based (active CPU and allocated memory, subject to current plan quotas); `Run` starts one sandbox. Review [Sandbox pricing and quotas](https://vercel.com/docs/sandbox/pricing) and set project spend controls before enabling public execution. Measure Vercel preview latency and quotas before release.
+
+The real-VM integration tests run only when `VERCEL=1` or `VERCEL_OIDC_TOKEN` is present. Mocked unit tests cover OIDC failure, network policy, output bounds, durable throttling, and fail-closed submission behavior without connecting to Vercel.

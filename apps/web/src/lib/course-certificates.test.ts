@@ -41,6 +41,7 @@ const database = vi.hoisted(() => {
 vi.mock("./db", () => ({ pool: { query: database.query, connect: async () => database.client } }));
 vi.mock("@/lib/auth", () => ({ getSession: async () => io.session ? { learnerId: "synthetic", name: "Synthetic Learner" } : null }));
 vi.mock("@/lib/executor", () => ({ callExecutor: async () => ({ status: io.status, stdout: "", stderr: "", truncated: false, feedback: [] }) }));
+vi.mock("@/lib/execution-rate-limit", () => ({ acquireExecutionPermit: async () => ({ allowed: true }) }));
 vi.mock("@/lib/catalog", () => ({
   findCatalogByExercise: async (id: string) => catalogs.find((catalog) => catalog.project?.id === id || catalog.exercises.some((exercise) => exercise.id === id)),
   findExercise: (catalog: PublishedCatalog, id: string) => catalog.project?.id === id ? catalog.project : catalog.exercises.find((exercise) => exercise.id === id),
@@ -59,7 +60,7 @@ function seed(certificate: CertificateRecord | null = null) {
   return { enrolledCourseIds: catalogs.map((c) => c.course.id), completedStepIds: catalogs.map((c) => `${c.course.id}-intro`), passedExerciseIds: ["existing-pass"], drafts: { existing: "untouched" }, attempts: [{ id: "old", exerciseId: "existing", status: "passed", at: "2020" }], assessmentPassed: true, assessmentCourseIds: catalogs.map((c) => c.course.id), certificate };
 }
 async function execute(id: string, mode = "submit") {
-  return POST(new Request("http://synthetic.test/api/execute", { method: "POST", body: JSON.stringify({ exerciseId: id, mode, source: "synthetic" }) }));
+  return POST(new Request("http://synthetic.test/api/execute", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ exerciseId: id, mode, source: "synthetic" }) }));
 }
 beforeEach(() => { io.text = JSON.stringify({ learners: { synthetic: seed() } }); io.session = true; io.status = "passed"; });
 

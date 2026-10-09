@@ -7,7 +7,7 @@
   },
   "scripts": {
     "import": "pnpm --filter @academy/course-engine import",
-    "dev": "pnpm --filter @academy/course-engine run import && pnpm --parallel --filter @academy/web --filter @academy/executor dev",
+    "dev": "pnpm --filter @academy/course-engine run import && pnpm --filter @academy/web dev",
     "test": "pnpm -r --if-present test",
     "lint": "pnpm -r --if-present lint",
     "typecheck": "pnpm -r --if-present typecheck"

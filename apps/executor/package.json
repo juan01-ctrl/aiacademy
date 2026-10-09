@@ -3,16 +3,20 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": "./src/grade.ts"
+  },
   "scripts": {
-    "dev": "tsx src/server.ts",
-    "start": "tsx src/server.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@academy/contracts": "workspace:*"
+    "@academy/contracts": "workspace:*",
+    "@vercel/sandbox": "^3.6.1",
+    "express": "^5.2.1"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
