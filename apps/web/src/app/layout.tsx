@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, IBM_Plex_Mono, Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { Navbar } from "@/components/nav/Navbar";
 import { getSession } from "@/lib/auth";
 import "./globals.css";
@@ -20,6 +21,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body className={`${inter.variable} ${fraunces.variable} ${plex.variable} antialiased`}>
         <Navbar user={session} />
         {children}
+        <Analytics />
       </body>
     </html>
   );
